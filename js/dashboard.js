@@ -538,14 +538,6 @@ function initApp() {
   // Alert dismiss
   $('alert-close')?.addEventListener('click', ()=>{ const b=$('alert-banner'); if(b) b.hidden=true; });
 
-  // AI Panel
-  const aiPanel  = $('ai-panel');
-  const aiToggle = $('ai-panel-toggle');
-  const aiClose  = $('ai-panel-close');
-  const openAI   = ()=>{ aiPanel?.classList.add('is-open');    aiToggle?.setAttribute('aria-expanded','true'); };
-  const closeAI  = ()=>{ aiPanel?.classList.remove('is-open'); aiToggle?.setAttribute('aria-expanded','false'); };
-  aiToggle?.addEventListener('click', ()=> aiPanel?.classList.contains('is-open') ? closeAI() : openAI());
-  aiClose?.addEventListener('click', closeAI);
   $('rec-accept-btn')?.addEventListener('click', ()=>{
     if (!state.selectedRoute) return;
     showAlert(`Route accepted: ${state.selectedRoute.name}. Booking flow coming soon.`, 'info');

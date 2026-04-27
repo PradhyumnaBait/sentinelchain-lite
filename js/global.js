@@ -7,7 +7,7 @@
 /* ── Utilities (safe even if dashboard.js not loaded) ── */
 function _clamp(v) { return Math.max(0, Math.min(100, Number(v) || 0)); }
 function _getSettings() {
-  try { return JSON.parse(localStorage.getItem('scl-settings') || '{}'); } catch(_) { return {}; }
+  try { return JSON.parse(localStorage.getItem('scl-settings') || '{}'); } catch (_) { return {}; }
 }
 
 /* ── Modal (HTML-safe, used by all pages) ────────── */
@@ -49,7 +49,7 @@ function openHistory() {
         </div>`).join('')
       : '<p style="color:#94a3b8">No history yet. Analyze a route on the Dashboard first.</p>';
     showModal('📋 Route History', body, true);
-  } catch(e) { showModal('📋 Route History', 'Error loading history.'); }
+  } catch (e) { showModal('📋 Route History', 'Error loading history.'); }
 }
 
 /* ── Alerts ──────────────────────────────────────── */
@@ -58,7 +58,7 @@ function updateAlertBadge() {
     const count = JSON.parse(localStorage.getItem('scl-alerts') || '[]').length;
     document.querySelectorAll('[data-action="alerts"] .sidebar-nav__badge, #sidebar-alerts .sidebar-nav__badge')
       .forEach(b => { b.textContent = count > 0 ? Math.min(count, 99) : ''; });
-  } catch(_) {}
+  } catch (_) { }
 }
 function openAlerts() {
   try {
@@ -74,14 +74,14 @@ function openAlerts() {
         </button></div>`;
     }
     showModal('🔔 Active Alerts', body, true);
-  } catch(e) { showModal('🔔 Alerts', 'Error loading alerts.'); }
+  } catch (e) { showModal('🔔 Alerts', 'Error loading alerts.'); }
 }
 
 /* ── Settings ────────────────────────────────────── */
 function openSettings() {
   const s = _getSettings();
-  const defaults = { weather:25, congestion:25, geopolitical:30, piracy:20 };
-  const rows = ['weather','congestion','geopolitical','piracy'].map(k => `
+  const defaults = { weather: 25, congestion: 25, geopolitical: 30, piracy: 20 };
+  const rows = ['weather', 'congestion', 'geopolitical', 'piracy'].map(k => `
     <label style="display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:13px;padding:6px 0">
       <span style="text-transform:capitalize;font-weight:500">${k} Weight (%)</span>
       <input id="g-set-${k}" type="number" min="0" max="100"
@@ -103,7 +103,7 @@ function openSettings() {
 function saveSettings() {
   try {
     const s = {};
-    ['weather','congestion','geopolitical','piracy'].forEach(k => {
+    ['weather', 'congestion', 'geopolitical', 'piracy'].forEach(k => {
       const el = document.getElementById('g-set-' + k);
       s[k] = el ? _clamp(Number(el.value)) : 25;
     });
@@ -119,7 +119,7 @@ function saveSettings() {
     } else {
       alert('Settings saved. Re-analyze a route to apply.');
     }
-  } catch(e) { console.error('[SCL global] saveSettings failed:', e); }
+  } catch (e) { console.error('[SCL global] saveSettings failed:', e); }
 }
 
 /* ── Home map: re-init guard + ship + live status ── */
@@ -139,22 +139,28 @@ function initHomeMap() {
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
-    // Static trade route lines
+    // Zigzag trade route lines (less artificial than straight segments)
     const routeCoords = [
-      [[19.08,72.88],[1.35,103.82],[22.32,114.17],[31.23,121.47]],
-      [[19.08,72.88],[12.36,43.15],[51.51,-0.13],[40.71,-74.01]],
-      [[22.32,114.17],[35.69,139.69],[-33.87,151.21]]
+      [[20, 60], [18, 70], [22, 80], [19, 90], [23, 100]],
+      [[15, 50], [18, 65], [16, 85], [20, 105]],
+      [[22, 78], [26, 92], [24, 108], [29, 122]]
     ];
-    const colors = ['#3B82F6','#8B5CF6','#10B981'];
-    routeCoords.forEach((r,i) => L.polyline(r,{color:colors[i],weight:3,opacity:0.7}).addTo(map));
+    const colors = ['#3B82F6', '#F59E0B', '#10B981'];
+    const weights = [3, 2, 2];
+    const opacities = [0.8, 0.6, 0.55];
+    routeCoords.forEach((r, i) => L.polyline(r, {
+      color: colors[i],
+      weight: weights[i],
+      opacity: opacities[i]
+    }).addTo(map));
     // Port markers
-    [[19.08,72.88,'Mumbai'],[1.35,103.82,'Singapore'],[22.32,114.17,'Hong Kong'],
-     [51.51,-0.13,'London'],[40.71,-74.01,'New York']]
-      .forEach(([lat,lng,name]) =>
-        L.circleMarker([lat,lng],{radius:5,color:'#3B82F6',fillColor:'#93C5FD',fillOpacity:1,weight:2})
-         .bindTooltip(name,{permanent:false,direction:'top'}).addTo(map));
+    [[19.08, 72.88, 'Mumbai'], [1.35, 103.82, 'Singapore'], [22.32, 114.17, 'Hong Kong'],
+    [51.51, -0.13, 'London'], [40.71, -74.01, 'New York']]
+      .forEach(([lat, lng, name]) =>
+        L.circleMarker([lat, lng], { radius: 5, color: '#3B82F6', fillColor: '#93C5FD', fillOpacity: 1, weight: 2 })
+          .bindTooltip(name, { permanent: false, direction: 'top' }).addTo(map));
     // Part 3: animated ship along primary route
-    const shipRoute = [[19.08,72.88],[1.35,103.82],[22.32,114.17],[31.23,121.47]];
+    const shipRoute = [[19.08, 72.88], [1.35, 103.82], [22.32, 114.17], [31.23, 121.47]];
     let progress = 0;
     const ship = L.circleMarker(shipRoute[0], {
       radius: 6, color: '#ffffff', fillColor: '#3b82f6',
@@ -162,10 +168,10 @@ function initHomeMap() {
     }).addTo(map);
     function interpolate(t) {
       const total = shipRoute.length - 1;
-      const i     = Math.min(Math.floor(t * total), total - 1);
-      const frac  = (t * total) - i;
-      const [la1,lo1] = shipRoute[i];
-      const [la2,lo2] = shipRoute[i + 1] || shipRoute[i];
+      const i = Math.min(Math.floor(t * total), total - 1);
+      const frac = (t * total) - i;
+      const [la1, lo1] = shipRoute[i];
+      const [la2, lo2] = shipRoute[i + 1] || shipRoute[i];
       return [la1 + (la2 - la1) * frac, lo1 + (lo2 - lo1) * frac];
     }
     let rafId;
@@ -178,7 +184,7 @@ function initHomeMap() {
     // Stop RAF when page is hidden (memory/CPU efficiency)
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) { cancelAnimationFrame(rafId); }
-      else                 { animateShip(); }
+      else { animateShip(); }
     });
     // Part 4: live intelligence status overlay
     if (!window.__statusInitialized) {
@@ -186,6 +192,11 @@ function initHomeMap() {
       const status = document.createElement('div');
       status.className = 'live-status';
       el.appendChild(status);
+      // Subtle static label to avoid "empty right-box" feel.
+      const label = document.createElement('div');
+      label.className = 'map-label';
+      label.textContent = 'Live Route Network';
+      el.appendChild(label);
       const msgs = [
         'Scanning weather systems…',
         'Analyzing congestion nodes…',
@@ -197,8 +208,8 @@ function initHomeMap() {
       status.textContent = msgs[0];
       setInterval(() => { mi = (mi + 1) % msgs.length; status.textContent = msgs[mi]; }, 2500);
     }
-    setTimeout(() => { try { map.invalidateSize(); } catch(_){} }, 400);
-  } catch(e) { console.warn('[SCL global] home map failed:', e); }
+    setTimeout(() => { try { map.invalidateSize(); } catch (_) { } }, 400);
+  } catch (e) { console.warn('[SCL global] home map failed:', e); }
 }
 
 /* ── Bind actions: event delegation (no duplicate listeners) */
@@ -210,30 +221,38 @@ function bindGlobalActions() {
       const el = e.target.closest('[data-action]');
       if (!el) return;
       const action = el.dataset.action;
-      const panel  = document.getElementById('ai-panel');
+      const panel = document.getElementById('ai-panel');
+      const layout = document.querySelector('.dashboard-layout');
       if (action === 'open-ai' && panel) {
         e.preventDefault();
-        panel.classList.toggle('is-open');
         panel.classList.toggle('open');
-        el.setAttribute('aria-expanded', panel.classList.contains('is-open'));
+        panel.classList.toggle('is-open', panel.classList.contains('open'));
+        layout?.classList.toggle('ai-open', panel.classList.contains('open'));
+        document.getElementById('ai-panel-toggle')?.setAttribute('aria-expanded', String(panel.classList.contains('open')));
       }
-      if (action === 'history')  { e.preventDefault(); openHistory(); }
-      if (action === 'alerts')   { e.preventDefault(); openAlerts(); }
+      if (action === 'close-ai' && panel) {
+        e.preventDefault();
+        panel.classList.remove('is-open', 'open');
+        layout?.classList.remove('ai-open');
+        document.getElementById('ai-panel-toggle')?.setAttribute('aria-expanded', 'false');
+      }
+      if (action === 'history') { e.preventDefault(); openHistory(); }
+      if (action === 'alerts') { e.preventDefault(); openAlerts(); }
       if (action === 'settings') { e.preventDefault(); openSettings(); }
-    });
-    // AI panel close button (direct, not delegated to avoid toggle confusion)
-    document.getElementById('ai-panel-close')?.addEventListener('click', () => {
-      const panel = document.getElementById('ai-panel');
-      panel?.classList.remove('is-open','open');
-      document.querySelector('[data-action="open-ai"]')?.setAttribute('aria-expanded','false');
     });
   }
   // Fallback ID-based sidebar links (for pages without data-action)
-  document.getElementById('sidebar-history') ?.addEventListener('click', e => { e.preventDefault(); openHistory(); });
-  document.getElementById('sidebar-alerts')  ?.addEventListener('click', e => { e.preventDefault(); openAlerts(); });
+  document.getElementById('sidebar-history')?.addEventListener('click', e => { e.preventDefault(); openHistory(); });
+  document.getElementById('sidebar-alerts')?.addEventListener('click', e => { e.preventDefault(); openAlerts(); });
   document.getElementById('sidebar-settings')?.addEventListener('click', e => { e.preventDefault(); openSettings(); });
   // Home map
   initHomeMap();
+  // Keep dashboard state deterministic on load/re-run
+  const panel = document.getElementById('ai-panel');
+  const layout = document.querySelector('.dashboard-layout');
+  if (panel && layout) {
+    layout.classList.toggle('ai-open', panel.classList.contains('open'));
+  }
   // Sync alert badge
   updateAlertBadge();
 }

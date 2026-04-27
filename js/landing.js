@@ -7,7 +7,7 @@
 
   /* ── Hamburger toggle ───────────────────────────── */
   const hamburger = document.getElementById('hamburger-btn');
-  const navLinks  = document.querySelector('.navbar__nav');
+  const navLinks = document.querySelector('.navbar__nav');
 
   if (hamburger && navLinks) {
     hamburger.addEventListener('click', () => {

@@ -119,10 +119,35 @@
   border-left: 1px solid var(--clr-border);
   box-shadow: -4px 0 24px rgba(0,0,0,0.06);
   z-index: var(--z-ai-panel);
-  display: flex;
+  display: none;
   flex-direction: column;
   padding: var(--layout-padding);
   gap: var(--layout-gap);
+  width: 0;
+  transform: translate3d(100%, 0, 0);
+  transition: width 0.35s ease, transform 0.35s ease;
+  will-change: transform;
+}
+
+.ai-panel.is-open,
+.ai-panel.open {
+  display: flex;
+  width: var(--layout-ai-panel-w);
+  transform: translate3d(0, 0, 0);
+}
+
+/* Dashboard layout state (class-based, no hierarchy change) */
+.dashboard-layout {
+  display: flex;
+}
+
+.dashboard-layout .map-container {
+  width: 100%;
+  transition: width 0.35s ease;
+}
+
+.dashboard-layout.ai-open .map-container {
+  width: calc(100% - var(--layout-ai-panel-w));
 }
 
 /* Content row: Map Panel dominates center */

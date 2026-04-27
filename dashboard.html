@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="SentinelChain Lite Dashboard — Real-time AI route risk analysis and optimization." />
+  <meta name="description"
+    content="SentinelChain Lite Dashboard — Real-time AI route risk analysis and optimization." />
   <title>Dashboard — SentinelChain Lite</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="css/tokens.css" />
   <link rel="stylesheet" href="css/reset.css" />
   <link rel="stylesheet" href="css/layout.css" />
@@ -15,6 +19,7 @@
   <link rel="stylesheet" href="css/dashboard.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
+
 <body class="page-dashboard" data-theme="light">
 
   <!-- ═══ NAVBAR ═══════════════════════════════════════ -->
@@ -30,7 +35,8 @@
         <a href="simulation.html" class="nav-link">Simulation</a>
       </nav>
       <div class="navbar__actions">
-        <button class="btn btn--ghost btn--sm" id="ai-panel-toggle" data-action="open-ai" aria-label="Toggle AI panel" aria-expanded="false">
+        <button class="btn btn--ghost btn--sm" id="ai-panel-toggle" data-action="open-ai" aria-label="Toggle AI panel"
+          aria-expanded="false">
           🤖 AI Panel
         </button>
         <button class="theme-toggle-btn" data-theme-toggle aria-label="Toggle theme" id="theme-toggle">🌙</button>
@@ -44,7 +50,7 @@
   <!-- ═══ DASHBOARD ROOT LAYOUT ════════════════════════
        [Sidebar 240px] [Main Area flex] [AI Panel 360px]
   ════════════════════════════════════════════════════ -->
-  <div class="dashboard-root" id="dashboard-root">
+  <div class="dashboard-root dashboard-layout" id="dashboard-root">
 
     <!-- ── SIDEBAR (240px fixed left) ───────────────── -->
     <aside class="sidebar" id="sidebar" aria-label="Dashboard sidebar">
@@ -100,32 +106,20 @@
     </aside>
 
     <!-- ── MAIN AREA (flex center) ──────────────────── -->
-    <main class="main-area" id="main-area" role="main">
+    <main class="main-area map-container" id="main-area" role="main">
 
       <!-- RouteForm (top input bar) -->
       <form class="route-form-bar" id="route-form" role="search" aria-label="Route input form" novalidate>
         <!-- Source -->
         <label for="input-source" class="sr-only">Origin</label>
-        <input
-          id="input-source"
-          class="form-input"
-          type="text"
-          placeholder="📍 Origin (city, port, address)"
-          autocomplete="off"
-          aria-required="true"
-        />
+        <input id="input-source" class="form-input" type="text" placeholder="📍 Origin (city, port, address)"
+          autocomplete="off" aria-required="true" />
         <!-- Arrow -->
         <span class="route-form-arrow" aria-hidden="true">→</span>
         <!-- Destination -->
         <label for="input-destination" class="sr-only">Destination</label>
-        <input
-          id="input-destination"
-          class="form-input"
-          type="text"
-          placeholder="🏁 Destination"
-          autocomplete="off"
-          aria-required="true"
-        />
+        <input id="input-destination" class="form-input" type="text" placeholder="🏁 Destination" autocomplete="off"
+          aria-required="true" />
         <!-- Delivery type -->
         <label for="delivery-type" class="sr-only">Delivery type</label>
         <select id="delivery-type" class="form-select" aria-label="Delivery type">
@@ -142,13 +136,7 @@
       </form>
 
       <!-- AlertBanner (conditional, hidden by default) -->
-      <div
-        class="alert-banner alert-banner--warning"
-        id="alert-banner"
-        role="alert"
-        aria-live="polite"
-        hidden
-      >
+      <div class="alert-banner alert-banner--warning" id="alert-banner" role="alert" aria-live="polite" hidden>
         <span class="alert-banner__icon" aria-hidden="true">⚠</span>
         <span class="alert-banner__text" id="alert-text">
           High seismic activity detected along Route A — consider Route B.
@@ -172,7 +160,8 @@
           <div class="map-toolbar" id="map-toolbar" role="toolbar" aria-label="Map controls">
             <button class="toolbar-btn" id="map-zoom-in" aria-label="Zoom in" title="Zoom in">+</button>
             <button class="toolbar-btn" id="map-zoom-out" aria-label="Zoom out" title="Zoom out">−</button>
-            <button class="toolbar-btn" id="map-layer-toggle" aria-label="Toggle risk overlay" title="Risk overlay">⬡</button>
+            <button class="toolbar-btn" id="map-layer-toggle" aria-label="Toggle risk overlay"
+              title="Risk overlay">⬡</button>
             <button class="toolbar-btn" id="map-reset-view" aria-label="Reset view" title="Reset view">⌖</button>
           </div>
 
@@ -196,8 +185,7 @@
           </div>
 
           <!-- Route Cards — rendered dynamically by dashboard.js -->
-          <div class="route-cards-overlay" id="route-cards"
-               role="list" aria-label="Route options" aria-live="polite">
+          <div class="route-cards-overlay" id="route-cards" role="list" aria-label="Route options" aria-live="polite">
             <!-- Cards injected here by JS after analysis -->
           </div>
         </section>
@@ -215,14 +203,15 @@
       <!-- Panel header -->
       <div class="ai-panel__header">
         <h2 class="ai-panel__title">AI Analysis</h2>
-        <button class="toolbar-btn" id="ai-panel-close" aria-label="Close AI panel">✕</button>
+        <button class="toolbar-btn" id="ai-panel-close" data-action="close-ai" aria-label="Close AI panel">✕</button>
       </div>
 
       <!-- RiskPanel -->
       <section class="panel-block" id="risk-panel" aria-labelledby="risk-panel-heading">
         <p class="panel-block__title" id="risk-panel-heading">Route Risk Score</p>
         <div class="risk-score-display">
-          <span class="risk-score-number risk-score-number--medium" id="risk-score-number" aria-label="Risk score 62 out of 100">62</span>
+          <span class="risk-score-number risk-score-number--medium" id="risk-score-number"
+            aria-label="Risk score 62 out of 100">62</span>
           <div class="risk-score-meta">
             <span class="risk-badge risk-badge--medium" id="risk-score-badge">Medium Risk</span>
             <p class="risk-score-sub" id="risk-score-sub">Route A selected</p>
@@ -231,28 +220,32 @@
         <div class="risk-factors" id="risk-factors" aria-label="Risk factors">
           <div class="risk-factor-row">
             <span class="risk-factor-label">Geopolitical</span>
-            <div class="risk-factor-bar-track" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" aria-label="Geopolitical risk 45%">
+            <div class="risk-factor-bar-track" role="progressbar" aria-valuenow="45" aria-valuemin="0"
+              aria-valuemax="100" aria-label="Geopolitical risk 45%">
               <div class="risk-factor-bar-fill" style="width:45%; background:var(--clr-risk-medium)"></div>
             </div>
             <span class="risk-factor-val">45</span>
           </div>
           <div class="risk-factor-row">
             <span class="risk-factor-label">Weather</span>
-            <div class="risk-factor-bar-track" role="progressbar" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100" aria-label="Weather risk 30%">
+            <div class="risk-factor-bar-track" role="progressbar" aria-valuenow="30" aria-valuemin="0"
+              aria-valuemax="100" aria-label="Weather risk 30%">
               <div class="risk-factor-bar-fill" style="width:30%; background:var(--clr-risk-low)"></div>
             </div>
             <span class="risk-factor-val">30</span>
           </div>
           <div class="risk-factor-row">
             <span class="risk-factor-label">Port Congestion</span>
-            <div class="risk-factor-bar-track" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" aria-label="Port congestion risk 70%">
+            <div class="risk-factor-bar-track" role="progressbar" aria-valuenow="70" aria-valuemin="0"
+              aria-valuemax="100" aria-label="Port congestion risk 70%">
               <div class="risk-factor-bar-fill" style="width:70%; background:var(--clr-risk-high)"></div>
             </div>
             <span class="risk-factor-val">70</span>
           </div>
           <div class="risk-factor-row">
             <span class="risk-factor-label">Piracy Index</span>
-            <div class="risk-factor-bar-track" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" aria-label="Piracy risk 20%">
+            <div class="risk-factor-bar-track" role="progressbar" aria-valuenow="20" aria-valuemin="0"
+              aria-valuemax="100" aria-label="Piracy risk 20%">
               <div class="risk-factor-bar-fill" style="width:20%; background:var(--clr-risk-low)"></div>
             </div>
             <span class="risk-factor-val">20</span>
@@ -265,7 +258,8 @@
         <p class="panel-block__title" id="confidence-heading">AI Confidence</p>
         <div class="confidence-meter">
           <span class="confidence-meter__value" id="confidence-value" aria-label="Confidence 87 percent">87%</span>
-          <div class="confidence-meter__bar-track" role="progressbar" aria-valuenow="87" aria-valuemin="0" aria-valuemax="100" aria-label="AI confidence level">
+          <div class="confidence-meter__bar-track" role="progressbar" aria-valuenow="87" aria-valuemin="0"
+            aria-valuemax="100" aria-label="AI confidence level">
             <div class="confidence-meter__bar-fill" id="confidence-fill" style="width: 87%"></div>
           </div>
           <div class="confidence-meter__label">
@@ -340,4 +334,5 @@
   <script src="js/dashboard.js"></script>
   <script src="js/global.js"></script>
 </body>
+
 </html>
