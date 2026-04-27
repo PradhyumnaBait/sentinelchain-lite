@@ -136,6 +136,7 @@ function initHomeMap() {
   window.__homeMapInitialized = true;
   try {
     const map = L.map('home-map').setView([20, 80], 3);
+    window.map = map;
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
@@ -212,6 +213,86 @@ function initHomeMap() {
   } catch (e) { console.warn('[SCL global] home map failed:', e); }
 }
 
+function initHomeEnhancements() {
+  const mapEl = document.getElementById('home-map');
+  if (!mapEl) return;
+  if (window.__homeEnhanced) return;
+  window.__homeEnhanced = true;
+
+  if (typeof L === 'undefined' || !window.map) return;
+
+  const route1 = [
+    [20, 60],
+    [18, 72],
+    [22, 85],
+    [19, 98],
+    [23, 110]
+  ];
+  const route2 = [
+    [15, 55],
+    [19, 68],
+    [17, 82],
+    [21, 100]
+  ];
+
+  L.polyline(route1, {
+    color: '#3b82f6',
+    weight: 3,
+    opacity: 0.85
+  }).addTo(window.map);
+
+  L.polyline(route2, {
+    color: '#f59e0b',
+    weight: 2,
+    opacity: 0.65
+  }).addTo(window.map);
+
+  if (!window.__homePulseRunning) {
+    window.__homePulseRunning = true;
+    const pulse = L.circleMarker([20, 60], {
+      radius: 5,
+      color: '#3b82f6'
+    }).addTo(window.map);
+
+    let t = 0;
+    function animate() {
+      t += 0.002;
+      if (t > 1) t = 0;
+      const lat = 20 + (3 * Math.sin(t * Math.PI));
+      const lng = 60 + (40 * t);
+      pulse.setLatLng([lat, lng]);
+      requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
+  }
+}
+
+function initHomeVisualFix() {
+  const box = document.querySelector('.hero-visual, #home-map');
+  if (!box) return;
+  if (box.dataset.enhanced) return;
+  box.dataset.enhanced = 'true';
+  const overlay = document.createElement('div');
+  overlay.className = 'hero-overlay-lines';
+  box.appendChild(overlay);
+}
+
+function bindMapPopEffect() {
+  if (window.__mapAnimDone) return;
+  window.__mapAnimDone = true;
+
+  document.addEventListener('click', function (e) {
+    const trigger = e.target.closest('[data-action="open-ai"]');
+    if (!trigger) return;
+    const map = document.querySelector('.map-container');
+    if (!map) return;
+    map.classList.remove('settle');
+    setTimeout(function () {
+      map.classList.add('settle');
+    }, 260);
+  });
+}
+
 /* ── Bind actions: event delegation (no duplicate listeners) */
 function bindGlobalActions() {
   // Part 1: single delegated listener for ALL data-action clicks
@@ -242,11 +323,17 @@ function bindGlobalActions() {
     });
   }
   // Fallback ID-based sidebar links (for pages without data-action)
-  document.getElementById('sidebar-history')?.addEventListener('click', e => { e.preventDefault(); openHistory(); });
-  document.getElementById('sidebar-alerts')?.addEventListener('click', e => { e.preventDefault(); openAlerts(); });
-  document.getElementById('sidebar-settings')?.addEventListener('click', e => { e.preventDefault(); openSettings(); });
+  if (!window.__sidebarFallbackBound) {
+    window.__sidebarFallbackBound = true;
+    document.getElementById('sidebar-history')?.addEventListener('click', e => { e.preventDefault(); openHistory(); });
+    document.getElementById('sidebar-alerts')?.addEventListener('click', e => { e.preventDefault(); openAlerts(); });
+    document.getElementById('sidebar-settings')?.addEventListener('click', e => { e.preventDefault(); openSettings(); });
+  }
   // Home map
   initHomeMap();
+  initHomeVisualFix();
+  initHomeEnhancements();
+  bindMapPopEffect();
   // Keep dashboard state deterministic on load/re-run
   const panel = document.getElementById('ai-panel');
   const layout = document.querySelector('.dashboard-layout');

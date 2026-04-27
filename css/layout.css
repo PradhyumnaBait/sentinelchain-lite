@@ -139,15 +139,23 @@
 /* Dashboard layout state (class-based, no hierarchy change) */
 .dashboard-layout {
   display: flex;
+  transition: grid-template-columns 0.65s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .dashboard-layout .map-container {
   width: 100%;
-  transition: width 0.35s ease;
+  transition:
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .dashboard-layout.ai-open .map-container {
   width: calc(100% - var(--layout-ai-panel-w));
+  transform: scale(0.94);
+}
+
+.dashboard-layout.ai-open .map-container.settle {
+  transform: scale(1);
 }
 
 /* Content row: Map Panel dominates center */
