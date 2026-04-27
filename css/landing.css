@@ -110,9 +110,38 @@
   overflow: hidden;
 }
 
+#hero-map-mock {
+  position: relative;
+}
+
+#hero-map-mock::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.03),
+      rgba(255, 255, 255, 0.03) 1px,
+      transparent 1px,
+      transparent 8px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.025),
+      rgba(255, 255, 255, 0.025) 1px,
+      transparent 1px,
+      transparent 10px
+    );
+  opacity: 0.25;
+  pointer-events: none;
+}
+
 .map-mock__grid {
   position: absolute;
   inset: 0;
+  z-index: 1;
   background-image:
     linear-gradient(rgba(59, 130, 246, 0.06) 1px, transparent 1px),
     linear-gradient(90deg, rgba(59, 130, 246, 0.06) 1px, transparent 1px);
@@ -123,24 +152,72 @@
   position: absolute;
   left: 10%;
   width: 80%;
-  height: 3px;
+  height: 2px;
   border-radius: var(--radius-full);
+  background: none;
+}
+
+.hero-map-mock--routes .map-mock__route {
+  display: none;
 }
 
 .route--safe {
-  background: linear-gradient(90deg, var(--clr-risk-safe), var(--clr-accent));
   top: 45%;
   opacity: 0.9;
 }
 
 .route--risk {
-  background: linear-gradient(90deg, var(--clr-risk-medium), var(--clr-risk-high));
   top: 58%;
   opacity: 0.55;
 }
 
+.hero-routes {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.hero-routes path {
+  fill: none;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.15));
+}
+
+#route-low {
+  stroke: #10b981;
+}
+
+#route-med {
+  stroke: #f59e0b;
+}
+
+#route-high {
+  stroke: #ef4444;
+}
+
+.mover {
+  filter: drop-shadow(0 0 6px currentColor);
+}
+
+.hero-routes .mover.low {
+  color: #10b981;
+}
+
+.hero-routes .mover.med {
+  color: #f59e0b;
+}
+
+.hero-routes .mover.high {
+  color: #ef4444;
+}
+
 .map-mock__marker {
   position: absolute;
+  z-index: 3;
   width: 14px;
   height: 14px;
   border-radius: var(--radius-full);
@@ -163,6 +240,7 @@
 
 .map-mock__overlay {
   position: absolute;
+  z-index: 3;
   top: 20%;
   left: 30%;
   width: 40%;
@@ -173,6 +251,7 @@
 
 .map-mock__badge {
   position: absolute;
+  z-index: 4;
   display: flex;
   align-items: center;
   gap: var(--space-1);
@@ -339,58 +418,6 @@
 .footer__copy {
   font-size: var(--text-xs);
   color: var(--clr-text-muted);
-}
-
-/* Home map depth layer */
-#home-map {
-  position: relative;
-  overflow: hidden;
-}
-
-#home-map::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: 80px 80px;
-  pointer-events: none;
-  z-index: 450;
-}
-
-.hero-overlay-lines {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 2;
-  overflow: hidden;
-}
-
-.hero-overlay-lines::before {
-  content: "";
-  position: absolute;
-  inset: -20%;
-  background:
-    linear-gradient(120deg, transparent 45%, rgba(59, 130, 246, 0.4) 50%, transparent 55%),
-    linear-gradient(240deg, transparent 45%, rgba(245, 158, 11, 0.35) 50%, transparent 55%);
-  background-size: 300px 120px;
-  animation: zigMove 12s linear infinite;
-}
-
-.hero-overlay-lines::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: 80px 80px;
-}
-
-@keyframes zigMove {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(300px); }
 }
 
 .map-label {

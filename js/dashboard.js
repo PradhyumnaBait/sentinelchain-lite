@@ -247,7 +247,25 @@ function getBestRoute(routes) {
 /* ══ PART 5 — MAP (NEVER FAIL) ═══════════════════ */
 let mapInstance = null;
 let routeLayer  = null;
+let routeDrawTimer = null;
 const polylines  = {};
+
+function drawRouteAnimated(map, latlngs, style) {
+  let index = 0;
+  const polyline = L.polyline([], style).addTo(map);
+
+  function step() {
+    if (index >= latlngs.length) {
+      routeDrawTimer = null;
+      return;
+    }
+    polyline.addLatLng(latlngs[index]);
+    index++;
+    routeDrawTimer = setTimeout(step, 60);
+  }
+  step();
+  return polyline;
+}
 
 function initMapSafe() {
   const el = $('map');
@@ -284,6 +302,10 @@ function drawAllRoutes() {
 /* ══ PART 10 — HIGHLIGHT ROUTE (fitBounds) ═════════ */
 function highlightRoute(route) {
   if (!mapInstance || !route) return;
+  if (routeDrawTimer) {
+    clearTimeout(routeDrawTimer);
+    routeDrawTimer = null;
+  }
   try { if (routeLayer) { mapInstance.removeLayer(routeLayer); routeLayer = null; } } catch(_) {}
   // Style all polylines
   for (const [rid, poly] of Object.entries(polylines)) {
@@ -298,10 +320,11 @@ function highlightRoute(route) {
   // If route has real coords, draw dedicated layer + fitBounds
   if (Array.isArray(route.coords) && route.coords.length >= 2) {
     try {
-      routeLayer = L.polyline(route.coords, {
+      const bounds = L.latLngBounds(route.coords);
+      mapInstance.fitBounds(bounds, { padding:[40,40], maxZoom:8 });
+      routeLayer = drawRouteAnimated(mapInstance, route.coords, {
         color: getRiskColor(route.riskScore||0), weight:5, opacity:0.9
-      }).addTo(mapInstance);
-      mapInstance.fitBounds(routeLayer.getBounds(), { padding:[40,40], maxZoom:8 });
+      });
     } catch(e) { console.warn('[SCL] fitBounds failed:', e); }
   }
 }

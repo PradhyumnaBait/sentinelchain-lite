@@ -267,16 +267,6 @@ function initHomeEnhancements() {
   }
 }
 
-function initHomeVisualFix() {
-  const box = document.querySelector('.hero-visual, #home-map');
-  if (!box) return;
-  if (box.dataset.enhanced) return;
-  box.dataset.enhanced = 'true';
-  const overlay = document.createElement('div');
-  overlay.className = 'hero-overlay-lines';
-  box.appendChild(overlay);
-}
-
 function bindMapPopEffect() {
   if (window.__mapAnimDone) return;
   window.__mapAnimDone = true;
@@ -331,7 +321,6 @@ function bindGlobalActions() {
   }
   // Home map
   initHomeMap();
-  initHomeVisualFix();
   initHomeEnhancements();
   bindMapPopEffect();
   // Keep dashboard state deterministic on load/re-run
