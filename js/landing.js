@@ -80,57 +80,18 @@
   animateStats();
 
   function injectHeroSvgRoutes() {
+    // SVG polylines are now baked into index.html — just ensure CSS class
     const mock = document.getElementById('hero-map-mock');
-    if (!mock || mock.dataset.svgRoutes === 'true') return;
-    mock.dataset.svgRoutes = 'true';
-    mock.classList.add('hero-map-mock--routes');
-
-    const svgNS = 'http://www.w3.org/2000/svg';
-    const svg = document.createElementNS(svgNS, 'svg');
-    svg.setAttribute('class', 'hero-routes');
-    svg.setAttribute('viewBox', '0 0 600 300');          // Part 1: sharp segment viewBox
-    svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
-    svg.setAttribute('aria-hidden', 'true');
-
-    // Part 1: polylines (sharp segments — NOT bezier curves)
-    const routes = [
-      { id: 'route-low',  pts: '40,200 150,150 280,180 400,140 540,180' },
-      { id: 'route-med',  pts: '40,220 180,210 300,160 420,200 540,210' },
-      { id: 'route-high', pts: '40,250 160,220 300,230 420,180 540,250' }
-    ];
-    routes.forEach(r => {
-      const poly = document.createElementNS(svgNS, 'polyline');
-      poly.setAttribute('id', r.id);
-      poly.setAttribute('points', r.pts);
-      svg.appendChild(poly);
-    });
-
-    // Mover dots
-    [{ cls:'mover low', fill:'#10b981' },
-     { cls:'mover med', fill:'#f59e0b' },
-     { cls:'mover high',fill:'#ef4444' }].forEach(m => {
-      const c = document.createElementNS(svgNS, 'circle');
-      c.setAttribute('class', m.cls);
-      c.setAttribute('r', '5');
-      c.setAttribute('fill', m.fill);
-      svg.appendChild(c);
-    });
-
-    // A / B labels
-    [{ x:16, y:210, t:'A' }, { x:548, y:178, t:'B' }].forEach(l => {
-      const txt = document.createElementNS(svgNS, 'text');
-      txt.setAttribute('x', l.x); txt.setAttribute('y', l.y);
-      txt.setAttribute('class', 'svg-label');
-      txt.textContent = l.t;
-      svg.appendChild(txt);
-    });
-
-    const grid = mock.querySelector('.map-mock__grid');
-    if (grid) mock.insertBefore(svg, grid.nextSibling);
-    else mock.appendChild(svg);
+    if (!mock) return;
+    if (mock.querySelector('.hero-routes')) {
+      mock.classList.add('hero-map-mock--routes');
+      return; // SVG already present in DOM
+    }
   }
 
+
   function animateRoutes() {
+
     if (window.__heroRoutesAnimBound) return;
     window.__heroRoutesAnimBound = true;
 
@@ -140,16 +101,17 @@
 
     // Part 1: segment-based interpolation (works with SVGPointList on <polyline>)
     const configs = [
-      { id: '#route-low',  dot: '.mover.low',  speed: 0.008 },
-      { id: '#route-med',  dot: '.mover.med',  speed: 0.006 },
-      { id: '#route-high', dot: '.mover.high', speed: 0.004 }
+      { id: '#route-low',  dot: '.mover.low',  speed: 0.012 },
+      { id: '#route-med',  dot: '.mover.med',  speed: 0.008 },
+      { id: '#route-high', dot: '.mover.high', speed: 0.005 }
     ];
 
     const runners = configs.map(cfg => {
       const poly = document.querySelector(cfg.id);
       const dot  = document.querySelector(cfg.dot);
       if (!poly || !dot) return null;
-      return { pts: poly.points, dot, speed: cfg.speed, i: 0, t: 0 };
+      const isImage = dot.tagName.toLowerCase() === 'image';
+      return { pts: poly.points, dot, speed: cfg.speed, i: 0, t: 0, isImage };
     }).filter(Boolean);
 
     if (!runners.length) return;
@@ -157,7 +119,10 @@
     if (reduced) {
       runners.forEach(r => {
         const p = r.pts.getItem(0);
-        if (p) { r.dot.setAttribute('cx', p.x); r.dot.setAttribute('cy', p.y); }
+        if (!p) return;
+        // Icon (image) uses x/y; circle uses cx/cy
+        if (r.isImage) { r.dot.setAttribute('x', p.x - 7); r.dot.setAttribute('y', p.y - 7); }
+        else { r.dot.setAttribute('cx', p.x); r.dot.setAttribute('cy', p.y); }
       });
       return;
     }
@@ -174,8 +139,11 @@
 
         const p1 = r.pts.getItem(r.i);
         const p2 = r.pts.getItem(r.i + 1);
-        r.dot.setAttribute('cx', p1.x + (p2.x - p1.x) * r.t);
-        r.dot.setAttribute('cy', p1.y + (p2.y - p1.y) * r.t);
+        const x = p1.x + (p2.x - p1.x) * r.t;
+        const y = p1.y + (p2.y - p1.y) * r.t;
+        // Icon (image) uses x/y with centering offset; circle uses cx/cy
+        if (r.isImage) { r.dot.setAttribute('x', x - 7); r.dot.setAttribute('y', y - 7); }
+        else { r.dot.setAttribute('cx', x); r.dot.setAttribute('cy', y); }
       });
       rafId = requestAnimationFrame(frame);
     }

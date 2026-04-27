@@ -264,7 +264,7 @@ function drawRouteAnimated(map, latlngs, style) {
     if (index >= latlngs.length) { routeDrawTimer = null; return; }
     polyline.addLatLng(latlngs[index]);
     index++;
-    routeDrawTimer = setTimeout(step, 80); // slower, smoother (Part 3)
+    routeDrawTimer = setTimeout(step, 110); // Part 3: controlled, premium draw speed
   }
   step();
   return polyline;

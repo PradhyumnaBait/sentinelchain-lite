@@ -1182,37 +1182,75 @@ button:active {
   }
 }
 
-/* ══ PART 4 — GLASSMORPHISM (dark mode only) ═════════
-   Scoped to [data-theme="dark"] so light mode is safe  */
-[data-theme="dark"] .ai-panel,
-[data-theme="dark"] .sidebar {
-  background: rgba(15, 25, 45, 0.72) !important;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+/* ══ PART 2 — GLASSMORPHISM (controlled, key surfaces) ═══ */
+.card,
+.sidebar,
+.ai-panel,
+.notify-modal,
+.route-card {
+  --glass-bg: rgba(15, 23, 42, 0.6);
+  --glass-border: rgba(255,255,255,0.12);
+
+  background: var(--glass-bg) !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
   box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.4),
-    inset 0 1px rgba(255, 255, 255, 0.06);
+    0 10px 30px rgba(0,0,0,0.35),
+    inset 0 1px rgba(255,255,255,0.05);
 }
 
-/* ══ PART 5 — SPRING PANEL TRANSITIONS ══════════════ */
-/* AI panel spring on all viewports */
+/* AI panel: extra depth — above everything */
 .ai-panel {
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+/* ══ PART 4 — SLOW SPRING PANEL TRANSITIONS ═════════ */
+.ai-panel,
+.notify-modal-overlay .notify-modal {
   transition:
-    transform 0.55s cubic-bezier(0.22, 1.2, 0.36, 1),
-    opacity 0.4s ease;
+    transform 0.7s cubic-bezier(0.22, 1.1, 0.36, 1),
+    opacity 0.5s ease;
 }
 
 /* Modal spring entrance */
 .notify-modal {
-  animation: modal-spring-in 0.5s cubic-bezier(0.22, 1.2, 0.36, 1) both;
+  animation: modal-spring-in 0.6s cubic-bezier(0.22, 1.1, 0.36, 1) both;
 }
 @keyframes modal-spring-in {
-  from { transform: translateX(40px) scale(0.97); opacity: 0; }
-  to   { transform: translateX(0) scale(1);       opacity: 1; }
+  from { transform: translateY(10px) scale(0.97); opacity: 0; }
+  to   { transform: translateY(0) scale(1);       opacity: 1; }
 }
 
-/* ══ PART 7 — FEATURE CARD HOVER DEPTH ══════════════ */
-.feature-card:hover {
+/* ══ PART 5 — MICRO UI POLISH ════════════════════════ */
+/* Hero subtext contrast */
+.hero__subtext {
+  color: rgba(255,255,255,0.75);
+}
+
+/* Card hover depth */
+.feature-card:hover,
+.card:hover {
   transform: translateY(-3px);
 }
+
+/* ══ PART 6 — SIMULATION TAB ENHANCEMENTS ════════════ */
+.sim-bar {
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.6s ease;
+}
+.sim-bar.active {
+  transform: scaleY(1);
+}
+
+.timeline-dot.high {
+  animation: timeline-pulse 2s infinite;
+}
+@keyframes timeline-pulse {
+  0%   { transform: scale(1);   opacity: 1; }
+  50%  { transform: scale(1.3); opacity: 0.6; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+

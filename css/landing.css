@@ -112,6 +112,10 @@
 
 #hero-map-mock {
   position: relative;
+  background:
+    linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
 }
 
 #hero-map-mock::before {
@@ -167,13 +171,14 @@
   pointer-events: none;
 }
 
-/* Part 1: polyline (sharp segments) replaces curved paths */
+/* Part 1: polyline (sharp segments) */
 .hero-routes polyline {
   fill: none;
   stroke-width: 2;
   stroke-linejoin: miter;
   stroke-linecap: square;
-  opacity: 0.85;   /* Part 7 */
+  opacity: 0.85;
+  filter: drop-shadow(0 0 4px rgba(0,0,0,0.2));
 }
 
 #route-low {

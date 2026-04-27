@@ -87,11 +87,30 @@
       <div class="hero__map-preview" aria-label="Route risk map preview">
         <div class="map-mock" id="hero-map-mock">
           <div class="map-mock__grid" aria-hidden="true"></div>
-          <div class="map-mock__route route--safe" aria-label="Safe route"></div>
-          <div class="map-mock__route route--risk" aria-label="High risk route"></div>
-          <div class="map-mock__marker marker--origin" aria-label="Origin"></div>
-          <div class="map-mock__marker marker--destination" aria-label="Destination"></div>
-          <div class="map-mock__overlay risk-overlay" aria-hidden="true"></div>
+
+          <!-- SVG Route System (polyline, sharp segments) -->
+          <svg class="hero-routes" viewBox="0 0 600 300" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+            <!-- LOW RISK (green) -->
+            <polyline id="route-low"
+              points="40,200 150,140 260,170 380,130 540,180" />
+            <!-- MEDIUM RISK (yellow) -->
+            <polyline id="route-med"
+              points="40,230 170,210 300,160 420,200 540,210" />
+            <!-- HIGH RISK (red) -->
+            <polyline id="route-high"
+              points="40,260 180,220 320,240 420,180 540,260" />
+
+            <!-- Moving icons (replace circles for technical look) -->
+            <image class="mover low"  href="https://cdn-icons-png.flaticon.com/512/684/684908.png"  width="14" height="14"/>
+            <image class="mover med"  href="https://cdn-icons-png.flaticon.com/512/252/252025.png"  width="14" height="14"/>
+            <image class="mover high" href="https://cdn-icons-png.flaticon.com/512/565/565547.png"  width="14" height="14"/>
+
+            <!-- A/B Labels -->
+            <text x="22"  y="200" class="svg-label">A</text>
+            <text x="548" y="180" class="svg-label">B</text>
+          </svg>
+
+          <!-- Risk / Safe badges -->
           <div class="map-mock__badge badge--risk" aria-label="Risk score">
             <span class="badge__icon">⚠</span>
             <span class="badge__text">Risk: High</span>
