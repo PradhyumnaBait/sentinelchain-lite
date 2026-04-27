@@ -251,17 +251,20 @@ let routeDrawTimer = null;
 const polylines  = {};
 
 function drawRouteAnimated(map, latlngs, style) {
+  if (!map || !Array.isArray(latlngs) || latlngs.length < 2) return null;
+  // Part 3: clear previous animated layers before drawing new one
+  map.eachLayer(layer => {
+    try { if (layer._isAnimatedRoute) map.removeLayer(layer); } catch(_) {}
+  });
   let index = 0;
   const polyline = L.polyline([], style).addTo(map);
+  polyline._isAnimatedRoute = true;
 
   function step() {
-    if (index >= latlngs.length) {
-      routeDrawTimer = null;
-      return;
-    }
+    if (index >= latlngs.length) { routeDrawTimer = null; return; }
     polyline.addLatLng(latlngs[index]);
     index++;
-    routeDrawTimer = setTimeout(step, 60);
+    routeDrawTimer = setTimeout(step, 80); // slower, smoother (Part 3)
   }
   step();
   return polyline;

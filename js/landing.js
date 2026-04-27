@@ -88,33 +88,41 @@
     const svgNS = 'http://www.w3.org/2000/svg';
     const svg = document.createElementNS(svgNS, 'svg');
     svg.setAttribute('class', 'hero-routes');
-    svg.setAttribute('viewBox', '0 0 100 100');
-    svg.setAttribute('preserveAspectRatio', 'none');
+    svg.setAttribute('viewBox', '0 0 600 300');          // Part 1: sharp segment viewBox
+    svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
     svg.setAttribute('aria-hidden', 'true');
 
-    const paths = [
-      { id: 'route-low', d: 'M 8 48 C 22 34, 38 58, 52 50 S 78 44, 92 52' },
-      { id: 'route-med', d: 'M 8 58 C 26 72, 44 48, 58 56 S 76 64, 92 54' },
-      { id: 'route-high', d: 'M 8 68 C 28 50, 46 72, 62 58 S 84 50, 92 62' }
+    // Part 1: polylines (sharp segments — NOT bezier curves)
+    const routes = [
+      { id: 'route-low',  pts: '40,200 150,150 280,180 400,140 540,180' },
+      { id: 'route-med',  pts: '40,220 180,210 300,160 420,200 540,210' },
+      { id: 'route-high', pts: '40,250 160,220 300,230 420,180 540,250' }
     ];
-    paths.forEach((p) => {
-      const path = document.createElementNS(svgNS, 'path');
-      path.setAttribute('id', p.id);
-      path.setAttribute('d', p.d);
-      svg.appendChild(path);
+    routes.forEach(r => {
+      const poly = document.createElementNS(svgNS, 'polyline');
+      poly.setAttribute('id', r.id);
+      poly.setAttribute('points', r.pts);
+      svg.appendChild(poly);
     });
 
-    const movers = [
-      { class: 'mover low', fill: '#10b981' },
-      { class: 'mover med', fill: '#f59e0b' },
-      { class: 'mover high', fill: '#ef4444' }
-    ];
-    movers.forEach((m) => {
+    // Mover dots
+    [{ cls:'mover low', fill:'#10b981' },
+     { cls:'mover med', fill:'#f59e0b' },
+     { cls:'mover high',fill:'#ef4444' }].forEach(m => {
       const c = document.createElementNS(svgNS, 'circle');
-      c.setAttribute('class', m.class);
-      c.setAttribute('r', '1.8');
+      c.setAttribute('class', m.cls);
+      c.setAttribute('r', '5');
       c.setAttribute('fill', m.fill);
       svg.appendChild(c);
+    });
+
+    // A / B labels
+    [{ x:16, y:210, t:'A' }, { x:548, y:178, t:'B' }].forEach(l => {
+      const txt = document.createElementNS(svgNS, 'text');
+      txt.setAttribute('x', l.x); txt.setAttribute('y', l.y);
+      txt.setAttribute('class', 'svg-label');
+      txt.textContent = l.t;
+      svg.appendChild(txt);
     });
 
     const grid = mock.querySelector('.map-mock__grid');
@@ -129,40 +137,45 @@
     injectHeroSvgRoutes();
 
     const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Part 1: segment-based interpolation (works with SVGPointList on <polyline>)
     const configs = [
-      { path: '#route-low', dot: '.mover.low', speed: 0.003 },
-      { path: '#route-med', dot: '.mover.med', speed: 0.002 },
-      { path: '#route-high', dot: '.mover.high', speed: 0.0015 }
+      { id: '#route-low',  dot: '.mover.low',  speed: 0.008 },
+      { id: '#route-med',  dot: '.mover.med',  speed: 0.006 },
+      { id: '#route-high', dot: '.mover.high', speed: 0.004 }
     ];
 
-    const runners = configs.map((cfg) => {
-      const path = document.querySelector(cfg.path);
-      const dot = document.querySelector(cfg.dot);
-      if (!path || !dot) return null;
-      const length = path.getTotalLength();
-      let t = 0;
-      return { path, dot, length, speed: cfg.speed, t };
+    const runners = configs.map(cfg => {
+      const poly = document.querySelector(cfg.id);
+      const dot  = document.querySelector(cfg.dot);
+      if (!poly || !dot) return null;
+      return { pts: poly.points, dot, speed: cfg.speed, i: 0, t: 0 };
     }).filter(Boolean);
 
     if (!runners.length) return;
 
     if (reduced) {
-      runners.forEach((r) => {
-        const pt = r.path.getPointAtLength(0);
-        r.dot.setAttribute('cx', pt.x);
-        r.dot.setAttribute('cy', pt.y);
+      runners.forEach(r => {
+        const p = r.pts.getItem(0);
+        if (p) { r.dot.setAttribute('cx', p.x); r.dot.setAttribute('cy', p.y); }
       });
       return;
     }
 
     let rafId = 0;
     function frame() {
-      runners.forEach((r) => {
+      runners.forEach(r => {
+        const total = r.pts.numberOfItems;
+        if (total < 2) return;
+
         r.t += r.speed;
-        if (r.t > 1) r.t = 0;
-        const point = r.path.getPointAtLength(r.t * r.length);
-        r.dot.setAttribute('cx', point.x);
-        r.dot.setAttribute('cy', point.y);
+        if (r.t >= 1) { r.i++; r.t = 0; }
+        if (r.i >= total - 1) { r.i = 0; r.t = 0; }   // loop back
+
+        const p1 = r.pts.getItem(r.i);
+        const p2 = r.pts.getItem(r.i + 1);
+        r.dot.setAttribute('cx', p1.x + (p2.x - p1.x) * r.t);
+        r.dot.setAttribute('cy', p1.y + (p2.y - p1.y) * r.t);
       });
       rafId = requestAnimationFrame(frame);
     }
@@ -171,7 +184,7 @@
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) cancelAnimationFrame(rafId);
       else rafId = requestAnimationFrame(frame);
-    });
+    }, { once: false });
   }
 
   animateRoutes();

@@ -1181,3 +1181,38 @@ button:active {
     transition: none !important;
   }
 }
+
+/* ══ PART 4 — GLASSMORPHISM (dark mode only) ═════════
+   Scoped to [data-theme="dark"] so light mode is safe  */
+[data-theme="dark"] .ai-panel,
+[data-theme="dark"] .sidebar {
+  background: rgba(15, 25, 45, 0.72) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.4),
+    inset 0 1px rgba(255, 255, 255, 0.06);
+}
+
+/* ══ PART 5 — SPRING PANEL TRANSITIONS ══════════════ */
+/* AI panel spring on all viewports */
+.ai-panel {
+  transition:
+    transform 0.55s cubic-bezier(0.22, 1.2, 0.36, 1),
+    opacity 0.4s ease;
+}
+
+/* Modal spring entrance */
+.notify-modal {
+  animation: modal-spring-in 0.5s cubic-bezier(0.22, 1.2, 0.36, 1) both;
+}
+@keyframes modal-spring-in {
+  from { transform: translateX(40px) scale(0.97); opacity: 0; }
+  to   { transform: translateX(0) scale(1);       opacity: 1; }
+}
+
+/* ══ PART 7 — FEATURE CARD HOVER DEPTH ══════════════ */
+.feature-card:hover {
+  transform: translateY(-3px);
+}

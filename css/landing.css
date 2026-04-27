@@ -119,22 +119,9 @@
   position: absolute;
   inset: 0;
   z-index: 0;
-  background-image:
-    repeating-linear-gradient(
-      0deg,
-      rgba(255, 255, 255, 0.03),
-      rgba(255, 255, 255, 0.03) 1px,
-      transparent 1px,
-      transparent 8px
-    ),
-    repeating-linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0.025),
-      rgba(255, 255, 255, 0.025) 1px,
-      transparent 1px,
-      transparent 10px
-    );
-  opacity: 0.25;
+  background-image: url("https://www.transparenttextures.com/patterns/topography.png");
+  opacity: 0.12;
+  filter: grayscale(100%);
   pointer-events: none;
 }
 
@@ -180,11 +167,13 @@
   pointer-events: none;
 }
 
-.hero-routes path {
+/* Part 1: polyline (sharp segments) replaces curved paths */
+.hero-routes polyline {
   fill: none;
-  stroke-width: 2.5;
-  stroke-linecap: round;
-  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.15));
+  stroke-width: 2;
+  stroke-linejoin: miter;
+  stroke-linecap: square;
+  opacity: 0.85;   /* Part 7 */
 }
 
 #route-low {
@@ -213,6 +202,14 @@
 
 .hero-routes .mover.high {
   color: #ef4444;
+}
+
+/* Part 1: A/B route labels */
+.svg-label {
+  fill: #9ca3af;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font-sans, Inter, sans-serif);
 }
 
 .map-mock__marker {
