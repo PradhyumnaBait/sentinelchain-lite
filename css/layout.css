@@ -1,0 +1,319 @@
+/* ═══════════════════════════════════════════════════
+   SENTINELCHAIN LITE — Layout Architecture
+   Phase 3: Sidebar 240px | AI Panel 360px | Map flex
+   Max-width 1440px | Gap 16px | Outer-pad 16px
+═══════════════════════════════════════════════════ */
+
+.container {
+  width: 100%;
+  max-width: var(--layout-max-width);
+  margin-inline: auto;
+  padding-inline: var(--layout-padding);
+}
+
+/* ─── Navbar ───────────────────────────────────── */
+.navbar {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: var(--navbar-h);
+  z-index: var(--z-sticky);
+  background: var(--clr-navbar-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--clr-border);
+  transition: background var(--dur-normal) var(--ease-default);
+}
+
+.navbar__inner {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.navbar__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-display);
+  font-weight: var(--fw-bold);
+  font-size: var(--text-lg);
+  flex-shrink: 0;
+}
+
+.navbar__nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  margin-left: auto;
+}
+
+.navbar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+.navbar__hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  padding: var(--space-2);
+  margin-left: auto;
+}
+
+.navbar__hamburger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--clr-text-primary);
+  border-radius: var(--radius-full);
+}
+
+/* ─── Dashboard Root Layout ─────────────────────
+   [Sidebar 240px] [Main Area flex] [AI Panel 360px]
+──────────────────────────────────────────────── */
+.dashboard-root {
+  display: flex;
+  width: 100%;
+  max-width: var(--layout-max-width);
+  margin-inline: auto;
+  height: 100vh;
+  padding-top: var(--navbar-h);
+  overflow: hidden;
+}
+
+/* Sidebar — 240px fixed left */
+.sidebar {
+  width: var(--layout-sidebar-w);
+  flex-shrink: 0;
+  height: 100%;
+  overflow-y: auto;
+  background: var(--clr-bg-elevated);
+  border-right: 1px solid var(--clr-border);
+  z-index: var(--z-base);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Main Area — flexible center */
+.main-area {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  padding: var(--layout-padding);
+  gap: var(--layout-gap);
+}
+
+/* AI Panel — 360px fixed right */
+.ai-panel {
+  width: var(--layout-ai-panel-w);
+  flex-shrink: 0;
+  height: 100%;
+  overflow-y: auto;
+  background: var(--clr-bg-surface-1);
+  border-left: 1px solid var(--clr-border);
+  box-shadow: -4px 0 24px rgba(0,0,0,0.06);
+  z-index: var(--z-base);
+  display: flex;
+  flex-direction: column;
+  padding: var(--layout-padding);
+  gap: var(--layout-gap);
+}
+
+/* Content row: Map Panel dominates center */
+.content-area {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  gap: var(--layout-gap);
+  position: relative;
+}
+
+/* Map Panel — fills remaining horizontal space */
+.map-panel {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: var(--clr-bg-surface);
+  border: 1px solid var(--clr-border);
+  box-shadow: var(--shadow-md);
+}
+
+.map-view {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: var(--z-base);
+}
+
+/* Map overlay: toolbar top-right */
+.map-toolbar {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  z-index: var(--z-dropdown);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Map overlay: legend bottom-left */
+.risk-legend {
+  position: absolute;
+  bottom: var(--space-4);
+  left: var(--space-4);
+  z-index: var(--z-dropdown);
+}
+
+/* Route cards overlay on map */
+.route-cards-overlay {
+  position: absolute;
+  bottom: var(--space-4);
+  right: var(--space-4);
+  left: var(--space-4);
+  z-index: var(--z-dropdown);
+  display: flex;
+  gap: var(--space-3);
+  pointer-events: none;
+}
+
+.route-cards-overlay .route-card {
+  pointer-events: all;
+}
+
+/* Alert Banner */
+.alert-banner {
+  width: 100%;
+  z-index: var(--z-alert);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+.alert-banner[hidden] { display: none; }
+
+/* Route Form Bar */
+.route-form-bar {
+  width: 100%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  background: var(--clr-bg-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-3) var(--space-4);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ─── Simulation Page Layout ───────────────────── */
+.sim-root {
+  display: flex;
+  width: 100%;
+  max-width: var(--layout-max-width);
+  margin-inline: auto;
+  height: 100vh;
+  padding-top: var(--navbar-h);
+  overflow: hidden;
+}
+
+.sim-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  gap: var(--layout-gap);
+  padding: var(--layout-padding);
+  height: 100%;
+  overflow: hidden;
+}
+
+.sim-left {
+  width: 340px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--layout-gap);
+  height: 100%;
+  overflow-y: auto;
+}
+
+.sim-right {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--layout-gap);
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ─── Tablet (≤1024px) ─────────────────────────── */
+@media (max-width: 1024px) {
+  .ai-panel {
+    position: fixed;
+    top: var(--navbar-h);
+    right: 0;
+    height: calc(100vh - var(--navbar-h));
+    transform: translateX(100%);
+    transition: transform var(--dur-slow) var(--ease-out);
+    z-index: var(--z-modal);
+    box-shadow: var(--shadow-xl);
+  }
+  .ai-panel.is-open { transform: translateX(0); }
+  .sim-left { width: 280px; }
+}
+
+/* ─── Mobile (≤768px) ──────────────────────────── */
+@media (max-width: 768px) {
+  .navbar__nav { display: none; }
+  .navbar__hamburger { display: flex; }
+  .navbar__actions { display: none; }
+
+  .sidebar {
+    position: fixed;
+    top: var(--navbar-h);
+    left: 0;
+    height: calc(100vh - var(--navbar-h));
+    transform: translateX(-100%);
+    transition: transform var(--dur-slow) var(--ease-out);
+    z-index: var(--z-modal);
+    box-shadow: var(--shadow-xl);
+  }
+  .sidebar.is-open { transform: translateX(0); }
+
+  .dashboard-root {
+    flex-direction: column;
+    height: auto;
+    overflow: auto;
+  }
+  .main-area { height: auto; padding: var(--space-3); }
+  .content-area { flex-direction: column; height: auto; }
+  .map-panel { height: 55vw; min-height: 280px; }
+  .ai-panel {
+    position: static;
+    width: 100%;
+    height: auto;
+    transform: none;
+    border-left: none;
+    border-top: 1px solid var(--clr-border);
+  }
+  .route-cards-overlay {
+    flex-direction: column;
+    position: static;
+    margin-top: var(--space-3);
+  }
+  .sim-main { flex-direction: column; height: auto; overflow: auto; }
+  .sim-left { width: 100%; height: auto; }
+  .sim-right { height: auto; }
+}

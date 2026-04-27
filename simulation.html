@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="SentinelChain Lite Simulation — Model disruption scenarios and assess route resilience." />
+  <title>Simulation — SentinelChain Lite</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+</head>
+<body class="page-simulation" data-theme="light">
+
+  <!-- ═══ NAVBAR ═══════════════════════════════════════ -->
+  <header class="navbar" role="banner">
+    <div class="navbar__inner container">
+      <a href="index.html" class="navbar__brand" aria-label="SentinelChain Lite Home">
+        <span class="brand-icon" aria-hidden="true">⬡</span>
+        <span class="brand-name">SentinelChain <em>Lite</em></span>
+      </a>
+      <nav class="navbar__nav" aria-label="Primary navigation">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="dashboard.html" class="nav-link">Dashboard</a>
+        <a href="simulation.html" class="nav-link is-active">Simulation</a>
+      </nav>
+      <div class="navbar__actions">
+        <a href="dashboard.html" class="btn btn--ghost btn--sm" id="nav-back-dashboard">← Dashboard</a>
+        <button class="theme-toggle-btn" data-theme-toggle aria-label="Toggle theme" id="theme-toggle">🌙</button>
+      </div>
+      <button class="navbar__hamburger" id="hamburger-btn" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ═══ SIMULATION ROOT LAYOUT ═══════════════════════
+       [Sidebar 240px] [sim-main: sim-left + sim-right]
+  ════════════════════════════════════════════════════ -->
+  <div class="sim-root" id="sim-root">
+
+    <!-- ── SIDEBAR (reused, 240px fixed left) ────────── -->
+    <aside class="sidebar" id="sidebar" aria-label="Dashboard sidebar">
+      <div class="sidebar__header">
+        <p class="sidebar__label">Navigation</p>
+      </div>
+      <nav class="sidebar-nav" aria-label="Sidebar navigation">
+        <a href="dashboard.html" class="sidebar-nav__item" id="sidebar-dashboard">
+          <span class="sidebar-nav__icon" aria-hidden="true">🗺</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="simulation.html" class="sidebar-nav__item is-active" id="sidebar-simulation">
+          <span class="sidebar-nav__icon" aria-hidden="true">⚡</span>
+          <span>Simulation</span>
+        </a>
+        <a href="#" class="sidebar-nav__item" id="sidebar-history">
+          <span class="sidebar-nav__icon" aria-hidden="true">📋</span>
+          <span>Route History</span>
+        </a>
+        <a href="#" class="sidebar-nav__item" id="sidebar-alerts">
+          <span class="sidebar-nav__icon" aria-hidden="true">🔔</span>
+          <span>Alerts</span>
+          <span class="sidebar-nav__badge">2</span>
+        </a>
+      </nav>
+      <div class="sidebar-divider" role="separator"></div>
+      <nav class="sidebar-nav">
+        <a href="#" class="sidebar-nav__item" id="sidebar-settings">
+          <span class="sidebar-nav__icon" aria-hidden="true">⚙</span>
+          <span>Settings</span>
+        </a>
+      </nav>
+      <div class="sidebar__footer">
+        <div class="sidebar-status" id="sidebar-status">
+          <span class="status-dot status-dot--live" aria-hidden="true"></span>
+          <span class="status-label">Live Feed Active</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ── SIM MAIN ──────────────────────────────────── -->
+    <main class="sim-main" id="sim-main" role="main">
+
+      <!-- ── SIM LEFT: Controls + Summary ─────────────── -->
+      <div class="sim-left" id="sim-left">
+
+        <!-- ScenarioControls -->
+        <section class="sim-panel-block" id="scenario-controls" aria-labelledby="scenario-heading">
+          <h2 class="sim-panel-block__title" id="scenario-heading">Scenario Controls</h2>
+
+          <!-- Scenario selector -->
+          <div class="form-group" id="form-group-scenario">
+            <label class="form-label" for="scenario-select">Disruption Scenario</label>
+            <select class="form-select" id="scenario-select" style="width:100%">
+              <option value="">— Select Scenario —</option>
+              <option value="port-strike">⚓ Port Strike</option>
+              <option value="typhoon">🌀 Typhoon Warning</option>
+              <option value="conflict">💥 Armed Conflict Zone</option>
+              <option value="pandemic">🦠 Pandemic Lockdown</option>
+              <option value="customs">🛃 Customs Delay</option>
+              <option value="piracy">☠ Piracy Alert</option>
+            </select>
+          </div>
+
+          <!-- Severity slider -->
+          <div class="form-group" id="form-group-severity">
+            <label class="form-label" for="severity-slider">
+              Severity Level: <strong id="severity-val">50</strong>
+            </label>
+            <input
+              type="range"
+              id="severity-slider"
+              class="range-slider"
+              min="0" max="100" value="50"
+              aria-label="Disruption severity level"
+            />
+            <div class="range-labels">
+              <span>Minimal</span>
+              <span>Severe</span>
+            </div>
+          </div>
+
+          <!-- Duration -->
+          <div class="form-group" id="form-group-duration">
+            <label class="form-label" for="duration-select">Estimated Duration</label>
+            <select class="form-select" id="duration-select" style="width:100%">
+              <option value="1d">1 Day</option>
+              <option value="3d">3 Days</option>
+              <option value="1w" selected>1 Week</option>
+              <option value="2w">2 Weeks</option>
+              <option value="1m">1 Month</option>
+            </select>
+          </div>
+
+          <!-- Affected region -->
+          <div class="form-group" id="form-group-region">
+            <label class="form-label" for="region-input">Affected Region</label>
+            <input
+              id="region-input"
+              class="form-input"
+              type="text"
+              placeholder="e.g. Singapore, Red Sea"
+              style="width:100%"
+            />
+          </div>
+
+          <!-- Run button -->
+          <button class="btn btn--primary" id="run-simulation-btn" style="width:100%">
+            ⚡ Run Simulation
+          </button>
+          <button class="btn btn--ghost btn--sm" id="reset-simulation-btn" style="width:100%">
+            Reset
+          </button>
+        </section>
+
+        <!-- ImpactSummary -->
+        <section class="sim-panel-block" id="impact-summary" aria-labelledby="impact-heading">
+          <h2 class="sim-panel-block__title" id="impact-heading">Impact Summary</h2>
+          <div class="impact-metric" id="impact-delay">
+            <span class="impact-metric__label">Delay Estimate</span>
+            <span class="impact-metric__value" id="impact-delay-val">+4.2 days</span>
+          </div>
+          <div class="impact-metric" id="impact-cost">
+            <span class="impact-metric__label">Cost Increase</span>
+            <span class="impact-metric__value impact-metric__value--warn" id="impact-cost-val">+18%</span>
+          </div>
+          <div class="impact-metric" id="impact-risk-delta">
+            <span class="impact-metric__label">Risk Delta</span>
+            <span class="impact-metric__value impact-metric__value--danger" id="impact-risk-val">▲ +28 pts</span>
+          </div>
+          <div class="impact-metric" id="impact-alt">
+            <span class="impact-metric__label">Best Alternative</span>
+            <span class="impact-metric__value impact-metric__value--safe" id="impact-alt-val">Route B</span>
+          </div>
+          <p class="impact-note" id="impact-note">
+            Under this scenario, Route A becomes critical. Route B via Cape of Good Hope is recommended.
+          </p>
+        </section>
+
+      </div>
+      <!-- end .sim-left -->
+
+      <!-- ── SIM RIGHT: Visualizations ─────────────────── -->
+      <div class="sim-right" id="sim-right">
+
+        <!-- RiskGauge -->
+        <div class="risk-gauge-wrap" id="risk-gauge-wrap" aria-label="Risk gauge">
+          <div class="sim-viz-header">
+            <h3 class="sim-viz-title">Simulated Risk Score</h3>
+            <span class="risk-badge risk-badge--high" id="gauge-badge">High Risk</span>
+          </div>
+          <div class="risk-gauge" id="risk-gauge" aria-label="Risk gauge visualization">
+            <div class="gauge-track" aria-hidden="true">
+              <div class="gauge-fill" id="gauge-fill" style="width: 78%"></div>
+            </div>
+            <div class="gauge-labels" aria-hidden="true">
+              <span>0</span>
+              <span class="gauge-score" id="gauge-score" aria-label="Risk score 78">78</span>
+              <span>100</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SparklineChart -->
+        <div class="chart-wrap" id="chart-wrap" aria-label="Risk trend chart">
+          <div class="sim-viz-header">
+            <h3 class="sim-viz-title">Risk Over Time (Simulated)</h3>
+            <span class="chart-period" id="chart-period">Next 14 days</span>
+          </div>
+          <div class="sparkline-chart" id="sparkline-chart" aria-label="Risk trend sparkline">
+            <!-- Chart renders here via JS / Canvas -->
+            <canvas id="sparkline-canvas" width="100%" height="160" aria-label="Sparkline chart showing risk over time"></canvas>
+            <div class="chart-placeholder" id="chart-placeholder" aria-hidden="true">
+              <div class="chart-bars" aria-hidden="true">
+                <div class="chart-bar" style="height:40%"></div>
+                <div class="chart-bar" style="height:55%"></div>
+                <div class="chart-bar" style="height:70%"></div>
+                <div class="chart-bar chart-bar--peak" style="height:90%"></div>
+                <div class="chart-bar chart-bar--peak" style="height:85%"></div>
+                <div class="chart-bar" style="height:72%"></div>
+                <div class="chart-bar" style="height:60%"></div>
+                <div class="chart-bar" style="height:48%"></div>
+                <div class="chart-bar" style="height:35%"></div>
+                <div class="chart-bar" style="height:30%"></div>
+                <div class="chart-bar" style="height:28%"></div>
+                <div class="chart-bar" style="height:25%"></div>
+                <div class="chart-bar" style="height:22%"></div>
+                <div class="chart-bar" style="height:20%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RiskTimeline -->
+        <div class="timeline-wrap" id="timeline-wrap" aria-label="Risk event timeline">
+          <div class="sim-viz-header">
+            <h3 class="sim-viz-title">Risk Timeline</h3>
+          </div>
+          <ol class="risk-timeline" id="risk-timeline" aria-label="Chronological risk events">
+            <li class="timeline-event timeline-event--danger" id="timeline-ev-1">
+              <span class="timeline-event__dot" aria-hidden="true"></span>
+              <div class="timeline-event__content">
+                <p class="timeline-event__label">Day 2 — Port Strike Begins</p>
+                <p class="timeline-event__desc">Singapore Tanjong Pagar — estimated 72h backlog</p>
+              </div>
+              <span class="risk-badge risk-badge--high">High</span>
+            </li>
+            <li class="timeline-event timeline-event--warn" id="timeline-ev-2">
+              <span class="timeline-event__dot" aria-hidden="true"></span>
+              <div class="timeline-event__content">
+                <p class="timeline-event__label">Day 5 — Weather Advisory</p>
+                <p class="timeline-event__desc">Tropical storm tracking toward South China Sea</p>
+              </div>
+              <span class="risk-badge risk-badge--medium">Medium</span>
+            </li>
+            <li class="timeline-event timeline-event--safe" id="timeline-ev-3">
+              <span class="timeline-event__dot" aria-hidden="true"></span>
+              <div class="timeline-event__content">
+                <p class="timeline-event__label">Day 9 — Strike Resolved</p>
+                <p class="timeline-event__desc">Port operations resume at 80% capacity</p>
+              </div>
+              <span class="risk-badge risk-badge--low">Low</span>
+            </li>
+          </ol>
+        </div>
+
+      </div>
+      <!-- end .sim-right -->
+
+    </main>
+    <!-- end .sim-main -->
+
+  </div>
+  <!-- end .sim-root -->
+
+  <script src="js/theme.js"></script>
+  <script src="js/simulation.js"></script>
+</body>
+</html>

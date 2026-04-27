@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="SentinelChain Lite — AI-powered supply chain risk routing platform. Optimize logistics with real-time intelligence." />
+  <title>SentinelChain Lite — Intelligent Route Risk Platform</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/landing.css" />
+  <link rel="stylesheet" href="css/components.css" />
+</head>
+<body class="page-landing" data-theme="light">
+
+  <!-- ─── NAVBAR ─────────────────────────────────────── -->
+  <header class="navbar" role="banner">
+    <div class="navbar__inner container">
+      <a href="index.html" class="navbar__brand" aria-label="SentinelChain Lite Home">
+        <span class="brand-icon" aria-hidden="true">⬡</span>
+        <span class="brand-name">SentinelChain <em>Lite</em></span>
+      </a>
+      <nav class="navbar__nav" aria-label="Primary navigation">
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#how-it-works" class="nav-link">How It Works</a>
+        <a href="dashboard.html" class="nav-link">Dashboard</a>
+      </nav>
+      <div class="navbar__actions">
+        <a href="dashboard.html" class="btn btn--primary" id="nav-cta-start">Start Routing</a>
+        <button class="theme-toggle-btn" data-theme-toggle aria-label="Toggle theme" id="theme-toggle">🌙</button>
+      </div>
+      <button class="navbar__hamburger" id="hamburger-btn" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ─── HERO ───────────────────────────────────────── -->
+  <section class="hero" id="hero" aria-labelledby="hero-headline">
+    <div class="hero__inner container">
+
+      <!-- Left: Text + CTA -->
+      <div class="hero__content">
+        <p class="hero__eyebrow">AI-Powered Logistics Intelligence</p>
+        <h1 class="hero__headline" id="hero-headline">
+          Route Smarter.<br />
+          Ship Safer.<br />
+          <span class="text-accent">Stay Ahead of Risk.</span>
+        </h1>
+        <p class="hero__subtext">
+          SentinelChain Lite uses real-time AI analysis to score route risk, 
+          predict disruptions, and recommend the safest path — before your shipment moves.
+        </p>
+        <div class="hero__cta-group">
+          <a href="dashboard.html" class="btn btn--primary btn--lg" id="hero-cta-start">
+            Start Routing
+          </a>
+          <a href="simulation.html" class="btn btn--ghost btn--lg" id="hero-cta-demo">
+            View Demo
+          </a>
+        </div>
+        <div class="hero__stats">
+          <div class="stat-badge">
+            <span class="stat-value">94%</span>
+            <span class="stat-label">Risk Accuracy</span>
+          </div>
+          <div class="stat-badge">
+            <span class="stat-value">3.2s</span>
+            <span class="stat-label">Avg Analysis</span>
+          </div>
+          <div class="stat-badge">
+            <span class="stat-value">180+</span>
+            <span class="stat-label">Risk Factors</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Map Preview -->
+      <div class="hero__map-preview" aria-label="Route risk map preview">
+        <div class="map-mock" id="hero-map-mock">
+          <div class="map-mock__grid" aria-hidden="true"></div>
+          <div class="map-mock__route route--safe" aria-label="Safe route"></div>
+          <div class="map-mock__route route--risk" aria-label="High risk route"></div>
+          <div class="map-mock__marker marker--origin" aria-label="Origin"></div>
+          <div class="map-mock__marker marker--destination" aria-label="Destination"></div>
+          <div class="map-mock__overlay risk-overlay" aria-hidden="true"></div>
+          <div class="map-mock__badge badge--risk" aria-label="Risk score">
+            <span class="badge__icon">⚠</span>
+            <span class="badge__text">Risk: High</span>
+          </div>
+          <div class="map-mock__badge badge--safe" aria-label="Safe score">
+            <span class="badge__icon">✓</span>
+            <span class="badge__text">AI Routed</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ─── FEATURES ───────────────────────────────────── -->
+  <section class="features-section" id="features" aria-labelledby="features-heading">
+    <div class="container">
+      <h2 class="section-heading" id="features-heading">Why SentinelChain?</h2>
+      <p class="section-subtext">Intelligent tools built for modern supply chain operations.</p>
+      <div class="features-grid">
+
+        <article class="feature-card" id="feature-risk">
+          <div class="feature-card__icon" aria-hidden="true">🛡</div>
+          <h3 class="feature-card__title">Real-Time Risk Scoring</h3>
+          <p class="feature-card__desc">Every route is analyzed across 180+ live risk factors including weather, conflict, port delays, and geopolitical alerts.</p>
+        </article>
+
+        <article class="feature-card" id="feature-ai">
+          <div class="feature-card__icon" aria-hidden="true">🤖</div>
+          <h3 class="feature-card__title">AI Recommendations</h3>
+          <p class="feature-card__desc">Our AI panel explains why a route is safe or risky — not just the score, but the reasoning behind it.</p>
+        </article>
+
+        <article class="feature-card" id="feature-sim">
+          <div class="feature-card__icon" aria-hidden="true">⚡</div>
+          <h3 class="feature-card__title">Scenario Simulation</h3>
+          <p class="feature-card__desc">What if there's a port strike? A typhoon? Simulate disruptions and see how your route performs before committing.</p>
+        </article>
+
+        <article class="feature-card" id="feature-map">
+          <div class="feature-card__icon" aria-hidden="true">🗺</div>
+          <h3 class="feature-card__title">Live Route Map</h3>
+          <p class="feature-card__desc">Visualize multiple route alternatives with color-coded risk overlays, waypoints, and corridor highlights.</p>
+        </article>
+
+        <article class="feature-card" id="feature-confidence">
+          <div class="feature-card__icon" aria-hidden="true">📊</div>
+          <h3 class="feature-card__title">Confidence Meter</h3>
+          <p class="feature-card__desc">Know exactly how confident our AI is in its recommendation — always transparent, always explainable.</p>
+        </article>
+
+        <article class="feature-card" id="feature-multimode">
+          <div class="feature-card__icon" aria-hidden="true">🚚</div>
+          <h3 class="feature-card__title">Multi-Modal Routing</h3>
+          <p class="feature-card__desc">Sea, air, road, rail — analyze risk across any delivery type and find the safest mode combination.</p>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── HOW IT WORKS ───────────────────────────────── -->
+  <section class="how-section" id="how-it-works" aria-labelledby="how-heading">
+    <div class="container">
+      <h2 class="section-heading" id="how-heading">How It Works</h2>
+      <ol class="how-steps">
+        <li class="how-step" id="step-1">
+          <span class="step-num" aria-hidden="true">01</span>
+          <div class="step-content">
+            <h3>Enter Your Route</h3>
+            <p>Input origin, destination, and delivery type in the Route Form.</p>
+          </div>
+        </li>
+        <li class="how-step" id="step-2">
+          <span class="step-num" aria-hidden="true">02</span>
+          <div class="step-content">
+            <h3>AI Analyzes Risk</h3>
+            <p>Our engine scores each route variant across live data streams.</p>
+          </div>
+        </li>
+        <li class="how-step" id="step-3">
+          <span class="step-num" aria-hidden="true">03</span>
+          <div class="step-content">
+            <h3>Review & Compare</h3>
+            <p>View route cards, map overlays, and the full AI explanation panel.</p>
+          </div>
+        </li>
+        <li class="how-step" id="step-4">
+          <span class="step-num" aria-hidden="true">04</span>
+          <div class="step-content">
+            <h3>Simulate & Decide</h3>
+            <p>Run disruption scenarios, then ship with confidence.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ─── CTA SECTION ────────────────────────────────── -->
+  <section class="cta-section" id="cta" aria-labelledby="cta-heading">
+    <div class="container">
+      <h2 class="cta-section__heading" id="cta-heading">Ready to Ship Smarter?</h2>
+      <p class="cta-section__sub">No setup. No contract. Just intelligent routing.</p>
+      <a href="dashboard.html" class="btn btn--primary btn--xl" id="cta-final">
+        Launch Dashboard →
+      </a>
+    </div>
+  </section>
+
+  <!-- ─── FOOTER ─────────────────────────────────────── -->
+  <footer class="footer" role="contentinfo">
+    <div class="footer__inner container">
+      <div class="footer__brand">
+        <span class="brand-icon" aria-hidden="true">⬡</span>
+        <span class="brand-name">SentinelChain <em>Lite</em></span>
+      </div>
+      <nav class="footer__links" aria-label="Footer navigation">
+        <a href="index.html">Home</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="simulation.html">Simulation</a>
+      </nav>
+      <p class="footer__copy">© 2025 SentinelChain Lite. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="js/theme.js"></script>
+  <script src="js/landing.js"></script>
+</body>
+</html>

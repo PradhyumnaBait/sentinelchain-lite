@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="SentinelChain Lite Dashboard — Real-time AI route risk analysis and optimization." />
+  <title>Dashboard — SentinelChain Lite</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body class="page-dashboard" data-theme="light">
+
+  <!-- ═══ NAVBAR ═══════════════════════════════════════ -->
+  <header class="navbar" role="banner">
+    <div class="navbar__inner container">
+      <a href="index.html" class="navbar__brand" aria-label="SentinelChain Lite Home">
+        <span class="brand-icon" aria-hidden="true">⬡</span>
+        <span class="brand-name">SentinelChain <em>Lite</em></span>
+      </a>
+      <nav class="navbar__nav" aria-label="Primary navigation">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="dashboard.html" class="nav-link is-active">Dashboard</a>
+        <a href="simulation.html" class="nav-link">Simulation</a>
+      </nav>
+      <div class="navbar__actions">
+        <button class="btn btn--ghost btn--sm" id="ai-panel-toggle" aria-label="Toggle AI panel" aria-expanded="false">
+          🤖 AI Panel
+        </button>
+        <button class="theme-toggle-btn" data-theme-toggle aria-label="Toggle theme" id="theme-toggle">🌙</button>
+      </div>
+      <button class="navbar__hamburger" id="hamburger-btn" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ═══ DASHBOARD ROOT LAYOUT ════════════════════════
+       [Sidebar 240px] [Main Area flex] [AI Panel 360px]
+  ════════════════════════════════════════════════════ -->
+  <div class="dashboard-root" id="dashboard-root">
+
+    <!-- ── SIDEBAR (240px fixed left) ───────────────── -->
+    <aside class="sidebar" id="sidebar" aria-label="Dashboard sidebar">
+
+      <!-- Sidebar header -->
+      <div class="sidebar__header">
+        <p class="sidebar__label">Navigation</p>
+      </div>
+
+      <!-- Primary nav -->
+      <nav class="sidebar-nav" aria-label="Sidebar navigation">
+        <a href="dashboard.html" class="sidebar-nav__item is-active" id="sidebar-dashboard">
+          <span class="sidebar-nav__icon" aria-hidden="true">🗺</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="simulation.html" class="sidebar-nav__item" id="sidebar-simulation">
+          <span class="sidebar-nav__icon" aria-hidden="true">⚡</span>
+          <span>Simulation</span>
+        </a>
+        <a href="#" class="sidebar-nav__item" id="sidebar-history">
+          <span class="sidebar-nav__icon" aria-hidden="true">📋</span>
+          <span>Route History</span>
+        </a>
+        <a href="#" class="sidebar-nav__item" id="sidebar-alerts">
+          <span class="sidebar-nav__icon" aria-hidden="true">🔔</span>
+          <span>Alerts</span>
+          <span class="sidebar-nav__badge" aria-label="2 alerts">2</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-divider" role="separator"></div>
+
+      <!-- Settings nav -->
+      <nav class="sidebar-nav" aria-label="Settings navigation">
+        <a href="#" class="sidebar-nav__item" id="sidebar-settings">
+          <span class="sidebar-nav__icon" aria-hidden="true">⚙</span>
+          <span>Settings</span>
+        </a>
+        <a href="index.html" class="sidebar-nav__item" id="sidebar-home">
+          <span class="sidebar-nav__icon" aria-hidden="true">⬡</span>
+          <span>Home</span>
+        </a>
+      </nav>
+
+      <!-- Sidebar footer: status -->
+      <div class="sidebar__footer">
+        <div class="sidebar-status" id="sidebar-status">
+          <span class="status-dot status-dot--live" aria-hidden="true"></span>
+          <span class="status-label">Live Feed Active</span>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- ── MAIN AREA (flex center) ──────────────────── -->
+    <main class="main-area" id="main-area" role="main">
+
+      <!-- RouteForm (top input bar) -->
+      <form class="route-form-bar" id="route-form" role="search" aria-label="Route input form" novalidate>
+        <!-- Source -->
+        <label for="input-source" class="sr-only">Origin</label>
+        <input
+          id="input-source"
+          class="form-input"
+          type="text"
+          placeholder="📍 Origin (city, port, address)"
+          autocomplete="off"
+          aria-required="true"
+        />
+        <!-- Arrow -->
+        <span class="route-form-arrow" aria-hidden="true">→</span>
+        <!-- Destination -->
+        <label for="input-destination" class="sr-only">Destination</label>
+        <input
+          id="input-destination"
+          class="form-input"
+          type="text"
+          placeholder="🏁 Destination"
+          autocomplete="off"
+          aria-required="true"
+        />
+        <!-- Delivery type -->
+        <label for="delivery-type" class="sr-only">Delivery type</label>
+        <select id="delivery-type" class="form-select" aria-label="Delivery type">
+          <option value="">All modes</option>
+          <option value="sea">🚢 Sea</option>
+          <option value="air">✈ Air</option>
+          <option value="road">🚚 Road</option>
+          <option value="rail">🚂 Rail</option>
+        </select>
+        <!-- Submit -->
+        <button type="submit" class="btn btn--primary" id="analyze-btn">
+          Analyze Route
+        </button>
+      </form>
+
+      <!-- AlertBanner (conditional, hidden by default) -->
+      <div
+        class="alert-banner alert-banner--warning"
+        id="alert-banner"
+        role="alert"
+        aria-live="polite"
+        hidden
+      >
+        <span class="alert-banner__icon" aria-hidden="true">⚠</span>
+        <span class="alert-banner__text" id="alert-text">
+          High seismic activity detected along Route A — consider Route B.
+        </span>
+        <button class="alert-banner__close" id="alert-close" aria-label="Dismiss alert">✕</button>
+      </div>
+
+      <!-- Content Area: Map Panel (center) + Route Cards (overlay) -->
+      <div class="content-area" id="content-area">
+
+        <!-- ── MAP PANEL ─────────────────────────────── -->
+        <section class="map-panel" id="map-panel" aria-label="Route map">
+
+          <!-- MapView (full height) -->
+          <div class="map-view" id="map-view" aria-label="Interactive route map">
+            <!-- Leaflet map mounts here -->
+            <div id="map"></div>
+          </div>
+
+          <!-- MapToolbar (top-right overlay) -->
+          <div class="map-toolbar" id="map-toolbar" role="toolbar" aria-label="Map controls">
+            <button class="toolbar-btn" id="map-zoom-in" aria-label="Zoom in" title="Zoom in">+</button>
+            <button class="toolbar-btn" id="map-zoom-out" aria-label="Zoom out" title="Zoom out">−</button>
+            <button class="toolbar-btn" id="map-layer-toggle" aria-label="Toggle risk overlay" title="Risk overlay">⬡</button>
+            <button class="toolbar-btn" id="map-reset-view" aria-label="Reset view" title="Reset view">⌖</button>
+          </div>
+
+          <!-- RiskLegend (bottom-left overlay) -->
+          <div class="risk-legend" id="risk-legend" aria-label="Risk level legend">
+            <div class="legend-block">
+              <p class="legend-block__title">Risk Level</p>
+              <div class="legend-row">
+                <span class="legend-dot" style="background:var(--clr-risk-safe)" aria-hidden="true"></span>
+                <span>Low / Safe</span>
+              </div>
+              <div class="legend-row">
+                <span class="legend-dot" style="background:var(--clr-risk-medium)" aria-hidden="true"></span>
+                <span>Medium</span>
+              </div>
+              <div class="legend-row">
+                <span class="legend-dot" style="background:var(--clr-risk-high)" aria-hidden="true"></span>
+                <span>High / Critical</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Route Cards — rendered dynamically by dashboard.js -->
+          <div class="route-cards-overlay" id="route-cards"
+               role="list" aria-label="Route options" aria-live="polite">
+            <!-- Cards injected here by JS after analysis -->
+          </div>
+        </section>
+        <!-- end .map-panel -->
+
+      </div>
+      <!-- end .content-area -->
+
+    </main>
+    <!-- end .main-area -->
+
+    <!-- ── AI PANEL (360px fixed right) ─────────────── -->
+    <aside class="ai-panel" id="ai-panel" aria-label="AI analysis panel">
+
+      <!-- Panel header -->
+      <div class="ai-panel__header">
+        <h2 class="ai-panel__title">AI Analysis</h2>
+        <button class="toolbar-btn" id="ai-panel-close" aria-label="Close AI panel">✕</button>
+      </div>
+
+      <!-- RiskPanel -->
+      <section class="panel-block" id="risk-panel" aria-labelledby="risk-panel-heading">
+        <p class="panel-block__title" id="risk-panel-heading">Route Risk Score</p>
+        <div class="risk-score-display">
+          <span class="risk-score-number risk-score-number--medium" id="risk-score-number" aria-label="Risk score 62 out of 100">62</span>
+          <div class="risk-score-meta">
+            <span class="risk-badge risk-badge--medium" id="risk-score-badge">Medium Risk</span>
+            <p class="risk-score-sub" id="risk-score-sub">Route A selected</p>
+          </div>
+        </div>
+        <div class="risk-factors" id="risk-factors" aria-label="Risk factors">
+          <div class="risk-factor-row">
+            <span class="risk-factor-label">Geopolitical</span>
+            <div class="risk-factor-bar-track" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" aria-label="Geopolitical risk 45%">
+              <div class="risk-factor-bar-fill" style="width:45%; background:var(--clr-risk-medium)"></div>
+            </div>
+            <span class="risk-factor-val">45</span>
+          </div>
+          <div class="risk-factor-row">
+            <span class="risk-factor-label">Weather</span>
+            <div class="risk-factor-bar-track" role="progressbar" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100" aria-label="Weather risk 30%">
+              <div class="risk-factor-bar-fill" style="width:30%; background:var(--clr-risk-low)"></div>
+            </div>
+            <span class="risk-factor-val">30</span>
+          </div>
+          <div class="risk-factor-row">
+            <span class="risk-factor-label">Port Congestion</span>
+            <div class="risk-factor-bar-track" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" aria-label="Port congestion risk 70%">
+              <div class="risk-factor-bar-fill" style="width:70%; background:var(--clr-risk-high)"></div>
+            </div>
+            <span class="risk-factor-val">70</span>
+          </div>
+          <div class="risk-factor-row">
+            <span class="risk-factor-label">Piracy Index</span>
+            <div class="risk-factor-bar-track" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" aria-label="Piracy risk 20%">
+              <div class="risk-factor-bar-fill" style="width:20%; background:var(--clr-risk-low)"></div>
+            </div>
+            <span class="risk-factor-val">20</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ConfidenceMeter -->
+      <section class="panel-block" id="confidence-panel" aria-labelledby="confidence-heading">
+        <p class="panel-block__title" id="confidence-heading">AI Confidence</p>
+        <div class="confidence-meter">
+          <span class="confidence-meter__value" id="confidence-value" aria-label="Confidence 87 percent">87%</span>
+          <div class="confidence-meter__bar-track" role="progressbar" aria-valuenow="87" aria-valuemin="0" aria-valuemax="100" aria-label="AI confidence level">
+            <div class="confidence-meter__bar-fill" id="confidence-fill" style="width: 87%"></div>
+          </div>
+          <div class="confidence-meter__label">
+            <span>Low</span>
+            <span>High</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- RecommendationCard -->
+      <section class="panel-block recommendation-card" id="recommendation-panel" aria-labelledby="rec-heading">
+        <p class="panel-block__title" id="rec-heading">AI Recommendation</p>
+        <p class="rec-card__headline" id="rec-headline">Take Route A via Strait of Malacca</p>
+        <p class="rec-card__body" id="rec-body">
+          Despite moderate port congestion at Singapore, geopolitical conditions are stable.
+          Weather outlook is clear for the next 10 days. Route A offers the best risk-to-time ratio.
+        </p>
+        <div class="rec-card__actions">
+          <button class="btn btn--primary btn--sm" id="rec-accept-btn">Accept Route</button>
+          <a href="simulation.html" class="btn btn--ghost btn--sm" id="rec-simulate-btn">Simulate</a>
+        </div>
+      </section>
+
+      <!-- ExplainabilityPanel -->
+      <section class="panel-block" id="explainability-panel" aria-labelledby="explain-heading">
+        <p class="panel-block__title" id="explain-heading">Why This Route?</p>
+        <div class="explain-list" id="explain-list">
+          <div class="explain-row">
+            <span class="explain-row__factor">Low piracy index in Malacca</span>
+            <span class="explain-row__impact" style="color:var(--clr-risk-safe)">+Safety</span>
+          </div>
+          <div class="explain-row">
+            <span class="explain-row__factor">Singapore port backlog 3 days</span>
+            <span class="explain-row__impact" style="color:var(--clr-risk-medium)">−Delay</span>
+          </div>
+          <div class="explain-row">
+            <span class="explain-row__factor">Clear monsoon forecast</span>
+            <span class="explain-row__impact" style="color:var(--clr-risk-safe)">+Safety</span>
+          </div>
+          <div class="explain-row">
+            <span class="explain-row__factor">Red Sea conflict avoidance</span>
+            <span class="explain-row__impact" style="color:var(--clr-risk-safe)">+Safety</span>
+          </div>
+        </div>
+      </section>
+
+    </aside>
+    <!-- end .ai-panel -->
+
+    <!-- ── SKELETON LOADERS (shown during analysis) ───── -->
+    <template id="skeleton-template">
+      <div class="skeleton-card" aria-hidden="true">
+        <div class="skeleton-row">
+          <div class="skeleton skeleton-circle"></div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+            <div class="skeleton skeleton-line skeleton-line--title"></div>
+            <div class="skeleton skeleton-line skeleton-line--short"></div>
+          </div>
+        </div>
+        <div class="skeleton skeleton-line skeleton-line--full"></div>
+        <div class="skeleton skeleton-line skeleton-line--medium"></div>
+        <div class="skeleton skeleton-bar"></div>
+      </div>
+    </template>
+
+  </div>
+  <!-- end .dashboard-root -->
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

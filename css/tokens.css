@@ -1,0 +1,153 @@
+/* ═══════════════════════════════════════════════════
+   SENTINELCHAIN LITE — Design Tokens
+   Light theme = default (:root)
+   Dark theme  = [data-theme="dark"]
+═══════════════════════════════════════════════════ */
+
+/* ══ LIGHT THEME (Default) ═══════════════════════ */
+:root {
+  /* ── Color Palette ─────────────────────────── */
+  --clr-bg-base:        #E6ECF3;
+  --clr-bg-elevated:    #D9E1EC;
+  --clr-bg-surface:     #FFFFFF;
+  --clr-bg-surface-1:   #F0F4FA;
+  --clr-bg-surface-2:   #D9E1EC;
+
+  --clr-border:         #B6C2D2;
+  --clr-border-strong:  #8B9BB5;
+
+  --clr-accent:         #3B82F6;
+  --clr-accent-hover:   #2563EB;
+  --clr-accent-glow:    rgba(59, 130, 246, 0.22);
+  --clr-accent-teal:    #14B8A6;
+
+  --clr-risk-high:      #DC2626;
+  --clr-risk-medium:    #D97706;
+  --clr-risk-low:       #16A34A;
+  --clr-risk-safe:      #059669;
+
+  --clr-text-primary:   #0B1F3A;
+  --clr-text-secondary: rgba(11, 31, 58, 0.75);
+  --clr-text-muted:     rgba(11, 31, 58, 0.55);
+  --clr-text-accent:    #3B82F6;
+
+  --clr-navbar-bg:      rgba(255, 255, 255, 0.82);
+  --clr-shadow-color:   rgba(11, 31, 58, 0.12);
+
+  /* ── Typography ────────────────────────────── */
+  --font-sans:    'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Space Grotesk', 'Inter', sans-serif;
+
+  --text-xs:   0.75rem;
+  --text-sm:   0.875rem;
+  --text-base: 1rem;
+  --text-lg:   1.125rem;
+  --text-xl:   1.25rem;
+  --text-2xl:  1.5rem;
+  --text-3xl:  1.875rem;
+  --text-4xl:  2.25rem;
+  --text-5xl:  3rem;
+  --text-6xl:  3.75rem;
+
+  --fw-light:    300;
+  --fw-regular:  400;
+  --fw-medium:   500;
+  --fw-semibold: 600;
+  --fw-bold:     700;
+  --fw-extrabold:800;
+
+  --lh-tight:   1.2;
+  --lh-snug:    1.375;
+  --lh-normal:  1.5;
+  --lh-relaxed: 1.65;
+
+  /* ── Spacing (locked system) ────────────────── */
+  --space-1:   0.25rem;
+  --space-2:   0.5rem;
+  --space-3:   0.75rem;
+  --space-4:   1rem;
+  --space-5:   1.25rem;
+  --space-6:   1.5rem;
+  --space-8:   2rem;
+  --space-10:  2.5rem;
+  --space-12:  3rem;
+  --space-16:  4rem;
+  --space-20:  5rem;
+  --space-24:  6rem;
+
+  /* ── Layout Dimensions ─────────────────────── */
+  --layout-max-width:  1440px;
+  --layout-sidebar-w:  240px;
+  --layout-ai-panel-w: 360px;
+  --layout-gap:        16px;
+  --layout-padding:    16px;
+  --navbar-h:          64px;
+
+  /* ── Border Radius ─────────────────────────── */
+  --radius-sm:   4px;
+  --radius-md:   8px;
+  --radius-lg:   14px;
+  --radius-xl:   18px;
+  --radius-2xl:  22px;
+  --radius-full: 9999px;
+
+  /* ── Shadows (depth enforced) ───────────────── */
+  --shadow-sm:  0 2px 8px rgba(0,0,0,0.06);
+  --shadow-md:  0 8px 20px rgba(0,0,0,0.08);
+  --shadow-lg:  0 12px 32px rgba(0,0,0,0.1);
+  --shadow-xl:  0 20px 48px rgba(0,0,0,0.14);
+  --shadow-accent: 0 0 0 2px rgba(59,130,246,0.3), 0 8px 20px rgba(59,130,246,0.18);
+
+  /* ── Z-Index System ────────────────────────── */
+  --z-base:     0;
+  --z-dropdown: 10;
+  --z-sticky:   20;
+  --z-modal:    50;
+  --z-alert:    60;
+
+  /* ── Transitions ───────────────────────────── */
+  --ease-default: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in:      cubic-bezier(0.4, 0, 1, 1);
+  --ease-out:     cubic-bezier(0, 0, 0.2, 1);
+  --ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --dur-fast:   150ms;
+  --dur-normal: 250ms;
+  --dur-slow:   400ms;
+}
+
+/* ══ DARK THEME Override ═════════════════════════ */
+[data-theme="dark"] {
+  --clr-bg-base:        #080c14;
+  --clr-bg-elevated:    #0d1220;
+  --clr-bg-surface:     #111827;
+  --clr-bg-surface-1:   #161e2e;
+  --clr-bg-surface-2:   #1c2638;
+
+  --clr-border:         rgba(255, 255, 255, 0.07);
+  --clr-border-strong:  rgba(255, 255, 255, 0.14);
+
+  --clr-accent:         #3b82f6;
+  --clr-accent-hover:   #60a5fa;
+  --clr-accent-glow:    rgba(59, 130, 246, 0.25);
+  --clr-accent-teal:    #14B8A6;
+
+  --clr-risk-high:      #ef4444;
+  --clr-risk-medium:    #f59e0b;
+  --clr-risk-low:       #22c55e;
+  --clr-risk-safe:      #10b981;
+
+  --clr-text-primary:   #f1f5f9;
+  --clr-text-secondary: #94a3b8;
+  --clr-text-muted:     #475569;
+  --clr-text-accent:    #60a5fa;
+
+  --clr-navbar-bg:      rgba(11, 31, 58, 0.72);
+  --clr-shadow-color:   rgba(0, 0, 0, 0.45);
+
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md:  0 4px 12px rgba(0,0,0,0.45);
+  --shadow-lg:  0 8px 32px rgba(0,0,0,0.55);
+  --shadow-xl:  0 16px 48px rgba(0,0,0,0.65);
+  --shadow-accent: 0 0 0 1px rgba(20,184,166,0.3), 0 4px 20px rgba(59,130,246,0.25);
+}
