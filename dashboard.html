@@ -64,14 +64,14 @@
           <span class="sidebar-nav__icon" aria-hidden="true">⚡</span>
           <span>Simulation</span>
         </a>
-        <a href="#" class="sidebar-nav__item" id="sidebar-history">
+        <a href="#" class="sidebar-nav__item" id="sidebar-history" data-action="history">
           <span class="sidebar-nav__icon" aria-hidden="true">📋</span>
           <span>Route History</span>
         </a>
-        <a href="#" class="sidebar-nav__item" id="sidebar-alerts">
+        <a href="#" class="sidebar-nav__item" id="sidebar-alerts" data-action="alerts">
           <span class="sidebar-nav__icon" aria-hidden="true">🔔</span>
           <span>Alerts</span>
-          <span class="sidebar-nav__badge" aria-label="2 alerts">2</span>
+          <span class="sidebar-nav__badge" aria-label="alerts"></span>
         </a>
       </nav>
 
@@ -79,7 +79,7 @@
 
       <!-- Settings nav -->
       <nav class="sidebar-nav" aria-label="Settings navigation">
-        <a href="#" class="sidebar-nav__item" id="sidebar-settings">
+        <a href="#" class="sidebar-nav__item" id="sidebar-settings" data-action="settings">
           <span class="sidebar-nav__icon" aria-hidden="true">⚙</span>
           <span>Settings</span>
         </a>
@@ -336,6 +336,8 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="js/theme.js"></script>
+  <script src="js/api.js"></script>
   <script src="js/dashboard.js"></script>
+  <script src="js/global.js"></script>
 </body>
 </html>

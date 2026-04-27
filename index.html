@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="css/layout.css" />
   <link rel="stylesheet" href="css/landing.css" />
   <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body class="page-landing" data-theme="light">
 
@@ -189,6 +190,20 @@
     </div>
   </section>
 
+  <!-- ─── LIVE DEMO MAP ──────────────────────────── -->
+  <section class="section" id="demo" aria-labelledby="demo-heading" style="padding:80px 0;background:var(--clr-bg-surface)">
+    <div class="container">
+      <h2 id="demo-heading" style="text-align:center;margin-bottom:12px;font-size:clamp(1.5rem,3vw,2.2rem)">Live Route Intelligence</h2>
+      <p style="text-align:center;color:var(--clr-text-secondary);margin-bottom:32px;font-size:1rem">Real-time global shipping routes rendered from OpenStreetMap data.</p>
+      <div id="home-map" style="height:400px;border-radius:16px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,0.12);border:1px solid var(--clr-border)"></div>
+      <p style="text-align:center;margin-top:16px;font-size:13px;color:var(--clr-text-muted)">
+        <span style="color:#3B82F6">●</span> Asia-Europe &nbsp;
+        <span style="color:#8B5CF6">●</span> Trans-Atlantic &nbsp;
+        <span style="color:#10B981">●</span> Asia-Pacific
+      </p>
+    </div>
+  </section>
+
   <!-- ─── CTA SECTION ────────────────────────────────── -->
   <section class="cta-section" id="cta" aria-labelledby="cta-heading">
     <div class="container">
@@ -216,7 +231,9 @@
     </div>
   </footer>
 
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="js/theme.js"></script>
   <script src="js/landing.js"></script>
+  <script src="js/global.js"></script>
 </body>
 </html>

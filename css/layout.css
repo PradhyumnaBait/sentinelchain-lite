@@ -92,7 +92,7 @@
   overflow-y: auto;
   background: var(--clr-bg-elevated);
   border-right: 1px solid var(--clr-border);
-  z-index: var(--z-base);
+  z-index: var(--z-sidebar);
   display: flex;
   flex-direction: column;
 }
@@ -118,7 +118,7 @@
   background: var(--clr-bg-surface-1);
   border-left: 1px solid var(--clr-border);
   box-shadow: -4px 0 24px rgba(0,0,0,0.06);
-  z-index: var(--z-base);
+  z-index: var(--z-ai-panel);
   display: flex;
   flex-direction: column;
   padding: var(--layout-padding);
@@ -273,7 +273,8 @@
     z-index: var(--z-modal);
     box-shadow: var(--shadow-xl);
   }
-  .ai-panel.is-open { transform: translateX(0); }
+  .ai-panel.is-open,
+  .ai-panel.open { transform: translateX(0); }
   .sim-left { width: 280px; }
 }
 

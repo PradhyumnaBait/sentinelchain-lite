@@ -102,8 +102,11 @@
   --z-base:     0;
   --z-dropdown: 10;
   --z-sticky:   20;
-  --z-modal:    50;
-  --z-alert:    60;
+  --z-alert:    50;
+  --z-sidebar:  100;
+  --z-ai-panel: 200;
+  --z-modal:    1000;
+  --z-overlay:  1100;
 
   /* ── Transitions ───────────────────────────── */
   --ease-default: cubic-bezier(0.4, 0, 0.2, 1);

@@ -610,8 +610,9 @@
   position: fixed;
   inset: 0;
   background: rgba(11,31,58,0.4);
-  backdrop-filter: blur(4px);
-  z-index: var(--z-modal);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: var(--z-modal);   /* 1000 — above sidebar(100) and ai-panel(200) */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -650,3 +651,42 @@
   line-height: var(--lh-relaxed);
 }
 .notify-modal__footer { display: flex; justify-content: flex-end; }
+
+/* ══ PART 5 — VISUAL ALIVE SYSTEM ════════════════ */
+/* Button hover scale (all non-primary buttons) */
+.btn--ghost:hover,
+.btn--secondary:hover,
+.btn--sm:hover {
+  transform: scale(1.03);
+}
+/* Override for primary (already has translateY) */
+.btn--primary:hover { transform: translateY(-1px) scale(1.01); }
+
+/* Sidebar badge dynamic */
+.sidebar-nav__badge {
+  margin-left: auto;
+  background: #EF4444;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  line-height: 1;
+}
+.sidebar-nav__badge:empty { display: none; }
+
+/* Modal wider for HTML content panels */
+.notify-modal {
+  max-width: 480px;
+  width: 90vw;
+}
+
+/* Route card min-height guarantee */
+.route-card {
+  min-height: 160px;
+}

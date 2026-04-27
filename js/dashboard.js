@@ -374,8 +374,11 @@ async function selectRoute(route) {
   else { const b=$('alert-banner'); if(b) b.hidden=true; }
   setState({ loading:true }); setPanelDim(true);
   try {
-    state.analysis = await getAnalysis(route);
-    renderAIPanel();
+    state.analysis = await (window.SentinelAPI
+      ? SentinelAPI.fetchAnalysis(route)
+      : getAnalysis(route)
+    ).catch(() => null);
+    if (state.analysis) renderAIPanel();
   } catch(e) { console.error('[SCL] Analysis error:', e); }
   finally { setState({ loading:false }); setPanelDim(false); }
 }
@@ -422,7 +425,7 @@ function setPanelDim(on) {
   });
 }
 
-/* ══ PART 13 — ANALYZE ROUTE (Nominatim + fallback) ═ */
+/* ══ PART 13 — ANALYZE ROUTE (Phase 7 API + Nominatim) */
 async function analyzeRoute() {
   if (state.loading) return;
   const src  = $('input-source')?.value.trim();
@@ -439,14 +442,28 @@ async function analyzeRoute() {
     '<div class="skeleton skeleton-bar"></div></div>').join('');
   setPanelDim(true);
   try {
-    let routes;
-    try { routes = await generateRoutes(src, dest); }
-    catch(geoErr) {
-      console.warn('[SCL] Nominatim failed, using fallback:', geoErr.message);
-      showAlert('Location lookup failed — using default routes.','warning');
-      routes = getFallbackRoutes().map(r=>({...r, origin:src, destination:dest}));
+    // Phase 7: use SentinelAPI first, then try Nominatim geocoding for real coords
+    let routes = await (window.SentinelAPI
+      ? SentinelAPI.fetchRoutes(src, dest)
+      : Promise.resolve(null)
+    ).catch(() => null);
+    if (!routes || !routes.length) {
+      console.warn('[SCL] API returned empty — using fallback routes');
+      routes = getFallbackRoutes().map(r => ({...r, origin:src, destination:dest}));
     }
-    routes.forEach(r => { r.riskScore = calculateRisk(r); r.risk = r.riskScore>=75?'high':r.riskScore>=50?'medium':'low'; });
+    // Attempt to enrich coords via Nominatim (best-effort, no crash on fail)
+    try {
+      const [start, end] = await Promise.all([getCoords(src), getCoords(dest)]);
+      const mid = [(start[0]+end[0])/2, (start[1]+end[1])/2];
+      routes[0].coords = [start, end];
+      routes[1].coords = [start, [mid[0]-5, mid[1]+10], end];
+      routes[2].coords = [start, [mid[0]+8, mid[1]-8], end];
+    } catch(_) { /* keep preset coords */ }
+    routes.forEach(r => {
+      r.riskScore = calculateRisk(r);
+      r.risk = r.riskScore >= 75 ? 'high' : r.riskScore >= 50 ? 'medium' : 'low';
+      r.origin = src; r.destination = dest;
+    });
     setState({ routes, analyzed:true });
     const best = getBestRoute(routes);
     setState({ selectedRoute: best });
@@ -454,7 +471,11 @@ async function analyzeRoute() {
     safeRun(() => highlightRoute(best));
     safeRun(() => saveHistory(best));
     safeRun(() => generateAlerts(best));
-    state.analysis = await getAnalysis(best).catch(()=>null);
+    // Phase 7: use SentinelAPI for analysis
+    state.analysis = await (window.SentinelAPI
+      ? SentinelAPI.fetchAnalysis(best)
+      : getAnalysis(best)
+    ).catch(() => null);
     if (state.analysis) renderAIPanel();
     showAlert(`Analysis complete: ${src} → ${dest}. ${best.label||best.name} recommended.`,'info');
   } catch(err) {
@@ -469,6 +490,7 @@ async function analyzeRoute() {
     setPanelDim(false);
   }
 }
+
 
 /* ══ ALERT ════════════════════════════════════════ */
 function showAlert(msg, type='warning') {
