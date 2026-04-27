@@ -138,18 +138,21 @@
 .map-panel {
   flex: 1;
   min-width: 0;
-  min-height: 0;
   position: relative;
   border-radius: var(--radius-xl);
-  overflow: hidden;
   background: var(--clr-bg-surface);
   border: 1px solid var(--clr-border);
   box-shadow: var(--shadow-md);
+  /* ═ STABILITY PATCH: col-flex so cards never disappear ═ */
+  display: flex;
+  flex-direction: column;
+  min-height: 540px;
+  overflow: visible;
 }
 
 .map-view {
   width: 100%;
-  height: 100%;
+  flex-shrink: 0;
   position: relative;
   z-index: var(--z-base);
 }
