@@ -1,0 +1,30 @@
+{
+  "name": "sentinelchain-lite-backend",
+  "version": "1.0.0",
+  "description": "SentinelChain Lite — AI-powered emergency routing assistant backend",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "dev:debug": "nodemon --inspect src/server.js"
+  },
+  "keywords": [
+    "emergency-routing",
+    "ai",
+    "risk-detection",
+    "disaster-logistics"
+  ],
+  "author": "SentinelChain Team",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.7.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "joi": "^17.13.3",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.3"
+  }
+}
