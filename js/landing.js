@@ -241,4 +241,28 @@
     });
   }, 7200);
 
+  /* ── Section 11: UI sanity check + auto-heal ─ */
+  window.addEventListener('load', function uiSanityCheck() {
+    const issues = [];
+    const aiEl   = document.querySelector('.ai-status');
+    const wxEl   = document.querySelector('.map-insights');
+
+    if (aiEl && wxEl) {
+      const a = aiEl.getBoundingClientRect();
+      const w = wxEl.getBoundingClientRect();
+      if (!(a.right < w.left || a.left > w.right)) {
+        issues.push('Overlap: .ai-status vs .map-insights');
+      }
+    }
+
+    if (getComputedStyle(document.body).backgroundColor === 'rgb(255, 255, 255)') {
+      issues.push('Harsh white background detected');
+    }
+
+    if (issues.length) {
+      console.warn('[SCL] UI issues detected:', issues);
+      document.body.classList.add('ui-autofix');
+    }
+  });
+
 })();

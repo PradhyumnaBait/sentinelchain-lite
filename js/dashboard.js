@@ -327,7 +327,14 @@ function highlightRoute(route) {
     mapInstance.fitBounds(bounds, { padding:[40,40], maxZoom:8 });
 
     const color = getRiskColor(route.riskScore || 0);
-    const line  = L.polyline([route.coords[0]], { color, weight:5, opacity:0.9 }).addTo(mapInstance);
+    const line  = L.polyline([route.coords[0]], {
+      color,
+      weight:   3,
+      opacity:  0.85,
+      lineCap:  'round',
+      lineJoin: 'round'
+    }).addTo(mapInstance);
+    line.isPrimaryRoute = true; // mark so cleanup passes skip it
     routeLayer  = line;
 
     // Part 3: RAF-based smooth draw animation

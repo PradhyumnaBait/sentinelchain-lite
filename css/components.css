@@ -1608,4 +1608,31 @@ body::before {
 [data-theme="light"] .ai-metrics {
   background: rgba(255,255,255,0.7) !important;
 }
+
+/* ─── Section 7: Alert bar glass ─────────────── */
+.alert-bar {
+  background: rgba(255,165,0,0.08);
+  border: 1px solid rgba(255,165,0,0.2);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 10px;
+  padding: 10px 16px;
+}
+
+/* ─── Section 11: UI auto-fix safety layer ──── */
+.ui-autofix .ai-status  { top: 16px !important; }
+.ui-autofix .map-insights { top: 40px !important; }
+
+/* Light theme text legibility */
+[data-theme="light"] .navbar,
+[data-theme="light"] .nav-link,
+[data-theme="light"] .navbar__brand {
+  color: var(--text-primary);
+}
+[data-theme="light"] .nav-link:hover {
+  background: rgba(0,0,0,0.05);
+}
+[data-theme="light"] .ai-status__line,
+[data-theme="light"] .ai-status__cursor { color: rgba(15,23,42,0.8); }
+[data-theme="light"] .heat-overlay      { opacity: 0.35; }
 

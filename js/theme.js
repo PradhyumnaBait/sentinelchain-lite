@@ -8,7 +8,7 @@
   'use strict';
 
   const STORAGE_KEY = 'scl-theme';
-  const DEFAULT_THEME = 'light';
+  const DEFAULT_THEME = 'dark'; // dark is the premium default
 
   /* ── Apply theme to <html> ──────────────────── */
   function applyTheme(theme) {
