@@ -508,6 +508,17 @@
   backdrop-filter: blur(8px);
 }
 
+/* Bug 4: when legend-block is INSIDE .risk-legend glass wrapper,
+   strip its own background/border/shadow — avoid double-layer */
+.risk-legend .legend-block {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
 .legend-block__title {
   font-size: var(--text-xs);
   font-weight: var(--fw-semibold);

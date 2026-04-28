@@ -79,9 +79,10 @@
   width: 100%;
   max-width: var(--layout-max-width);
   margin-inline: auto;
-  height: 100vh;
+  min-height: 100vh;        /* Step 1: was height:100vh — now stretches with content */
   padding-top: var(--navbar-h);
-  overflow: hidden;
+  overflow-x: hidden;       /* Step 1: was overflow:hidden — allow vertical scroll */
+  overflow-y: auto;
 }
 
 /* Sidebar — 240px fixed left */
@@ -103,9 +104,11 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  height: 100%;
-  overflow: hidden;
+  min-height: 0;             /* Step 2: was height:100% */
+  overflow-y: auto;          /* Step 2: was overflow:hidden — this was clipping cards */
+  overflow-x: hidden;
   padding: var(--layout-padding);
+  padding-bottom: 20px;      /* Step 3+4: tight content end */
   gap: var(--layout-gap);
 }
 
@@ -143,6 +146,7 @@
 /* Dashboard layout state (class-based, no hierarchy change) */
 .dashboard-layout {
   display: flex;
+  align-items: flex-start;   /* Bug 7: prevent children stretching full height */
   transition: grid-template-columns 0.75s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -185,27 +189,56 @@
   position: relative;
 }
 
-/* Map Panel — fills remaining horizontal space */
+/* Map Panel — the unified map+routes glass wrapper (Steps 1+3) */
 .map-panel {
   flex: 1;
   min-width: 0;
   position: relative;
-  border-radius: var(--radius-xl);
-  background: var(--clr-bg-surface);
-  border: 1px solid var(--clr-border);
+  border-radius: 18px;
+  background: rgba(10, 15, 25, 0.55);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,0.06);
   box-shadow: var(--shadow-md);
-  /* ═ STABILITY PATCH: col-flex so cards never disappear ═ */
   display: flex;
   flex-direction: column;
-  min-height: 540px;
-  overflow: visible;
+  min-height: 0;
+  overflow: hidden;            /* clips map + cards cleanly inside radius */
+  margin-bottom: 24px;
+}
+[data-theme="light"] .map-panel {
+  background: rgba(255,255,255,0.65);
+  border-color: rgba(0,0,0,0.08);
 }
 
+/* Step 4: map-view — top section of the unified wrapper */
 .map-view {
   width: 100%;
   flex-shrink: 0;
   position: relative;
   z-index: var(--z-base);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+[data-theme="light"] .map-view {
+  border-bottom-color: rgba(0,0,0,0.06);
+}
+
+/* Step 10: blue glow divider at map bottom edge */
+.map-view::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(59,130,246,0.45),
+    transparent
+  );
+  pointer-events: none;
+  z-index: 2;
 }
 
 /* Map overlay: toolbar top-right */
@@ -219,31 +252,87 @@
   gap: var(--space-2);
 }
 
-/* Map overlay: legend bottom-left */
+/* Step 2: risk-legend — glassmorphic overlay inside .map-view */
 .risk-legend {
   position: absolute;
-  bottom: var(--space-4);
-  left: var(--space-4);
+  bottom: 14px;
+  left: 14px;
   z-index: var(--z-dropdown);
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(10, 15, 25, 0.68);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.07);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  font-size: 12px;
+  color: #cbd5e1;
+}
+[data-theme="light"] .risk-legend {
+  background: rgba(255,255,255,0.82);
+  border-color: rgba(0,0,0,0.08);
+  color: #334155;
 }
 
-/* Route cards overlay on map */
+/* Steps 5+6: route cards — grid layout, no extra gap */
 .route-cards-overlay {
-  position: absolute;
-  bottom: var(--space-4);
-  right: var(--space-4);
-  left: var(--space-4);
-  z-index: var(--z-dropdown);
-  display: flex;
-  gap: var(--space-3);
-  pointer-events: none;
+  position: static !important;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  align-items: start;           /* Step 7: prevent uneven stretch */
+  gap: 16px;
+  padding: 0 18px 0;            /* Step 5: no padding-bottom */
+  margin-bottom: 0;
+  scroll-behavior: smooth;
+  pointer-events: auto;
+  flex-shrink: 0;
 }
-
 .route-cards-overlay .route-card {
   pointer-events: all;
+  cursor: pointer;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
+.route-cards-overlay .route-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(59,130,246,0.4);
+}
+/* Active card — shared by both .active (JS) and .is-selected (renderRoutes) */
+.route-cards-overlay .route-card.active,
+.route-cards-overlay .route-card.is-selected {
+  border-color: rgba(59,130,246,0.6);
+  background: rgba(59,130,246,0.08);
+  box-shadow: 0 0 0 1px rgba(59,130,246,0.4), 0 0 20px rgba(59,130,246,0.15);
+}
+/* Step 6: conditional space only when AI panel is open (global.js toggles .ai-open) */
+.dashboard-layout.ai-open .route-options-container {
+  padding-bottom: 60px;
+}
+/* Step 6: map pulse on route select */
+@keyframes mapPulse {
+  0%   { box-shadow: var(--shadow-md); }
+  50%  { box-shadow: 0 0 40px rgba(59,130,246,0.25), var(--shadow-md); }
+  100% { box-shadow: var(--shadow-md); }
+}
+.map-panel.map-focus { animation: mapPulse 1s ease; }
 
-/* Alert Banner */
+/* Steps 7+9: route-options-title uppercase label */
+.route-options-title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.45);
+  padding: 16px 18px 10px;
+  flex-shrink: 0;
+}
+[data-theme="light"] .route-options-title { color: rgba(15,23,42,0.45); }
+
+/* Step 4: page bottom anchor — minimal, controlled */
+body::after {
+  content: "";
+  display: block;
+  height: 20px;   /* reduced from 40px */
+}
 .alert-banner {
   width: 100%;
   z-index: var(--z-alert);

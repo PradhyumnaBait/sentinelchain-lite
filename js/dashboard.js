@@ -421,6 +421,40 @@ async function selectRoute(route) {
   if (state.selectedRoute?.id === route.id) return;
   setState({ selectedRoute: route });
   renderRoutes(state.routes.length ? state.routes : getFallbackRoutes());
+
+  /* ── Step 5: Active card + scroll to map ─────────── */
+  safeRun(() => {
+    // Mark the selected card .active (renderRoutes already marks .is-selected,
+    // but .active drives the blue border pulse defined in layout.css)
+    document.querySelectorAll('#route-cards .route-card').forEach(c => {
+      c.classList.toggle('active', c.dataset.routeId === String(route.id));
+    });
+
+    // Step 3: Precise scroll using #map-anchor — reliable with fixed navbar
+    const anchor = document.getElementById('map-anchor');
+    const mapPanel = document.querySelector('.map-panel');
+
+    if (anchor) {
+      const rect = anchor.getBoundingClientRect();
+      const isVisible = rect.top >= -80 && rect.top <= window.innerHeight;
+      if (!isVisible) {
+        window.scrollTo({
+          top: rect.top + window.scrollY,
+          behavior: 'smooth'
+        });
+      }
+    }
+
+    // Step 6: map panel pulse highlight
+    if (mapPanel) {
+      mapPanel.classList.remove('map-focus');
+      void mapPanel.offsetWidth; // force reflow to restart animation
+      mapPanel.classList.add('map-focus');
+      setTimeout(() => mapPanel.classList.remove('map-focus'), 1000);
+    }
+  });
+  /* ─────────────────────────────────────────────────── */
+
   safeRun(() => highlightRoute(route));
   safeRun(() => saveHistory(route));
   safeRun(() => generateAlerts(route));

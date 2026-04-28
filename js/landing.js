@@ -103,7 +103,7 @@
       const timer = setInterval(() => {
         if (i >= msg.length) {
           clearInterval(timer);
-          setTimeout(showChips, 2000); // chips at ~2.5s
+          setTimeout(showChips, 600); // chips appear 600ms after typing (was 2000ms)
           return;
         }
         typingEl.textContent = msg.slice(0, ++i);

@@ -86,17 +86,19 @@
 /* ─── Leaflet Map Container ──────────────────────── */
 .map-view {
   width: 100%;
-  height: 100%;
+  height: 420px;
+  min-height: 420px;
+  max-height: 420px;    /* Bug 6: hard cap — prevents Leaflet overflow */
   position: relative;
-  overflow: hidden;
   border-radius: 12px;
+  overflow: hidden;     /* Bug 6: safe here, legend is absolute inside */
 }
 
 #map {
   width: 100%;
   height: 420px;
-  flex-shrink: 0;
   min-height: 420px;
+  max-height: 420px;    /* Bug 6: match parent cap */
   border-radius: 12px 12px 0 0;
   z-index: 1;
 }
@@ -111,24 +113,91 @@
   position: absolute;
 }
 
-/* Route cards — stable static flow below map */
+/* Route cards — layout.css owns display/grid rules */
 .route-cards-overlay {
   position: static !important;
-  display: flex;
-  flex-direction: row;
-  gap: 16px;
-  overflow-x: auto;
-  min-height: 150px;
-  padding: 12px 16px 16px 16px;
-  flex-wrap: nowrap;
-  align-items: stretch;
+  flex-shrink: 0;
+  pointer-events: auto;
 }
 .route-cards-overlay:empty::after {
   content: 'Enter a route above and click Analyze to see options';
   font-size: var(--text-sm);
   color: var(--clr-text-muted);
-  align-self: center;
   padding: var(--space-4);
+  display: block;
+  text-align: center;
+  grid-column: 1 / -1;  /* span all grid columns */
+}
+
+/* Step 5: routes panel — dark gradient section below map */
+.route-options-container {
+  padding: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(10, 15, 25, 0.60),
+    rgba(10, 15, 25, 0.88)
+  );
+  flex-shrink: 0;
+}
+[data-theme="light"] .route-options-container {
+  background: linear-gradient(
+    to bottom,
+    rgba(240,244,250,0.8),
+    rgba(235,240,248,0.95)
+  );
+}
+
+/* Step 8: route-card sizing — professional visual weight */
+.route-card {
+  padding: 18px;
+  min-height: 140px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.08);
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.route-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(59,130,246,0.4);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+.route-card.active,
+.route-card.is-selected {
+  border-color: rgba(59,130,246,0.6);
+  background: rgba(59,130,246,0.08);
+  box-shadow: 0 0 0 1px rgba(59,130,246,0.25);
+}
+[data-theme="light"] .route-card {
+  background: rgba(255,255,255,0.7);
+  border-color: rgba(0,0,0,0.08);
+}
+
+/* Step 2: scroll anchor — sits above map-panel, offsets fixed navbar */
+#map-anchor {
+  position: relative;
+  top: -80px;         /* matches --navbar-h; adjust if navbar height differs */
+  pointer-events: none;
+  visibility: hidden;
+  height: 0;
+}
+
+/* Step 6: micro-interactions */
+.route-card:active {
+  transform: scale(0.98);
+}
+.route-card.is-selected,
+.route-card.active {
+  border-color: rgba(59,130,246,0.6);
+  background: rgba(59,130,246,0.08);
+  box-shadow:
+    0 0 0 1px rgba(59,130,246,0.4),
+    0 0 20px rgba(59,130,246,0.15);
 }
 
 .map-grid-bg {

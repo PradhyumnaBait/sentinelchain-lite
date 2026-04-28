@@ -147,6 +147,9 @@
       <!-- Content Area: Map Panel (center) + Route Cards (overlay) -->
       <div class="content-area" id="content-area">
 
+        <!-- Step 1: scroll anchor — compensates for fixed navbar height -->
+        <div id="map-anchor" aria-hidden="true"></div>
+
         <!-- ── MAP PANEL ─────────────────────────────── -->
         <section class="map-panel" id="map-panel" aria-label="Route map">
 
@@ -154,6 +157,25 @@
           <div class="map-view" id="map-view" aria-label="Interactive route map">
             <!-- Leaflet map mounts here -->
             <div id="map"></div>
+
+            <!-- RiskLegend (bottom-left overlay) -->
+            <div class="risk-legend" id="risk-legend" aria-label="Risk level legend">
+              <div class="legend-block">
+                <p class="legend-block__title">Risk Level</p>
+                <div class="legend-row">
+                  <span class="legend-dot" style="background:var(--clr-risk-safe)" aria-hidden="true"></span>
+                  <span>Low / Safe</span>
+                </div>
+                <div class="legend-row">
+                  <span class="legend-dot" style="background:var(--clr-risk-medium)" aria-hidden="true"></span>
+                  <span>Medium</span>
+                </div>
+                <div class="legend-row">
+                  <span class="legend-dot" style="background:var(--clr-risk-high)" aria-hidden="true"></span>
+                  <span>High / Critical</span>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- MapToolbar (top-right overlay) -->
@@ -165,28 +187,12 @@
             <button class="toolbar-btn" id="map-reset-view" aria-label="Reset view" title="Reset view">⌖</button>
           </div>
 
-          <!-- RiskLegend (bottom-left overlay) -->
-          <div class="risk-legend" id="risk-legend" aria-label="Risk level legend">
-            <div class="legend-block">
-              <p class="legend-block__title">Risk Level</p>
-              <div class="legend-row">
-                <span class="legend-dot" style="background:var(--clr-risk-safe)" aria-hidden="true"></span>
-                <span>Low / Safe</span>
-              </div>
-              <div class="legend-row">
-                <span class="legend-dot" style="background:var(--clr-risk-medium)" aria-hidden="true"></span>
-                <span>Medium</span>
-              </div>
-              <div class="legend-row">
-                <span class="legend-dot" style="background:var(--clr-risk-high)" aria-hidden="true"></span>
-                <span>High / Critical</span>
-              </div>
+          <!-- Route options panel — title + cards wrapped as one block -->
+          <div class="route-options-container">
+            <div class="route-options-title" aria-hidden="true">Available Routes</div>
+            <div class="route-cards-overlay" id="route-cards" role="list" aria-label="Route options" aria-live="polite">
+              <!-- Cards injected here by JS after analysis -->
             </div>
-          </div>
-
-          <!-- Route Cards — rendered dynamically by dashboard.js -->
-          <div class="route-cards-overlay" id="route-cards" role="list" aria-label="Route options" aria-live="polite">
-            <!-- Cards injected here by JS after analysis -->
           </div>
         </section>
         <!-- end .map-panel -->
