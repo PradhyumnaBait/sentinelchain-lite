@@ -1474,17 +1474,50 @@ textarea:focus {
   box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
 }
 
-/* Part 7 — Subtle background depth gradient (GPU-safe: fixed + transform/opacity only) */
+/* Steps 1+2 — Full-depth background system */
+
+/* Step 1: dual radial glow on body (GPU-safe, no repaints) */
+body {
+  background:
+    radial-gradient(1200px 600px at 75% 30%, rgba(59,130,246,0.12), transparent 60%),
+    radial-gradient(900px 500px at 20% 70%, rgba(16,185,129,0.08), transparent 60%),
+    #020617 !important;
+}
+
+/* Step 1: grid overlay — replaces the single weak radial */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
-  background: radial-gradient(
-    circle at 70% 30%,
-    rgba(59,130,246,0.07),
-    transparent 50%
-  );
+  background-image:
+    linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+  background-size: 80px 80px;
   pointer-events: none;
   z-index: 0;
+}
+
+/* Step 2: glass extended to landing sections */
+.feature-card {
+  background: rgba(15, 23, 42, 0.55) !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.4),
+    inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.cta-section {
+  background: rgba(15, 23, 42, 0.55) !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid rgba(255,255,255,0.08) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.footer {
+  background: rgba(10, 16, 32, 0.7) !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid rgba(255,255,255,0.06) !important;
 }
 
