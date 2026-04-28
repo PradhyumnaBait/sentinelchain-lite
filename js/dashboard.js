@@ -341,6 +341,7 @@
     state.routes.forEach((route) => {
       const selected = route.id === state.selectedRouteId;
       const riskClass = getRiskClass(route.riskScore);
+      const riskColor = getRiskColor(route.riskScore || 0);
       const badgeParts = [route.riskLevel];
       if (route.isRecommended) badgeParts.push("Safer");
       if (route.isFastest) badgeParts.push("Fastest");
@@ -349,9 +350,14 @@
       card.className = `route-card${selected ? " is-selected active" : ""}${route.isRecommended ? " is-recommended" : ""}`;
       card.dataset.routeId = route.id;
       card.tabIndex = 0;
+      // Color-coded left border ties card to its map polyline
+      card.style.borderLeft = `4px solid ${riskColor}`;
       card.innerHTML = `
         <div class="route-card__header">
-          <span class="route-card__label">${route.label}</span>
+          <span class="route-card__label">
+            <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${riskColor};margin-right:6px;vertical-align:middle;"></span>
+            ${route.label}
+          </span>
           <span class="risk-badge risk-badge--${riskClass}">${badgeParts.join(" · ")}</span>
         </div>
         <div class="route-card__body">

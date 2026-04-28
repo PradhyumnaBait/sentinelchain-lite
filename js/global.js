@@ -159,32 +159,6 @@ function initHomeMap() {
         L.circleMarker([lat, lng], { radius: 5, color: '#3B82F6', fillColor: '#93C5FD', fillOpacity: 1, weight: 2 })
           .bindTooltip(name, { permanent: false, direction: 'top' }).addTo(map));
 
-    const convoyRoute = routeCoords[0];
-    let progress = 0;
-    const convoy = L.circleMarker(convoyRoute[0], {
-      radius: 6, color: '#ffffff', fillColor: '#3b82f6',
-      fillOpacity: 1, weight: 2, className: 'ship-marker'
-    }).addTo(map);
-    function interpolate(t) {
-      const total = convoyRoute.length - 1;
-      const i = Math.min(Math.floor(t * total), total - 1);
-      const frac = (t * total) - i;
-      const [la1, lo1] = convoyRoute[i];
-      const [la2, lo2] = convoyRoute[i + 1] || convoyRoute[i];
-      return [la1 + (la2 - la1) * frac, lo1 + (lo2 - lo1) * frac];
-    }
-    let rafId;
-    function animateConvoy() {
-      progress = (progress + 0.0015) % 1;
-      convoy.setLatLng(interpolate(progress));
-      rafId = requestAnimationFrame(animateConvoy);
-    }
-    animateConvoy();
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) { cancelAnimationFrame(rafId); }
-      else { animateConvoy(); }
-    });
-
     if (!window.__statusInitialized) {
       window.__statusInitialized = true;
       const status = document.createElement('div');

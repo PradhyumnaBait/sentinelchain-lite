@@ -74,9 +74,11 @@
   }
 
   function interpolateMockPath(start, end, steps, offsetFactor) {
+    // Generate 20+ points for smooth polylines in fallback mode
+    const density = Math.max(steps, 20);
     const pts = [start];
-    for (let i = 1; i < steps; i++) {
-      const t = i / steps;
+    for (let i = 1; i < density; i++) {
+      const t = i / density;
       const lat = start[0] + (end[0] - start[0]) * t + offsetFactor * Math.sin(t * Math.PI) * (end[1] - start[1]) * 0.15;
       const lng = start[1] + (end[1] - start[1]) * t - offsetFactor * Math.sin(t * Math.PI) * (end[0] - start[0]) * 0.15;
       pts.push([Math.round(lat * 10000) / 10000, Math.round(lng * 10000) / 10000]);
@@ -102,7 +104,7 @@
         eta: baseEta, etaText: `${Math.round(baseEta * 1.35)} mins`,
         distance: distKm, distanceText: `${distKm} km`,
         weather: 30, congestion: 65, routeVulnerability: 38,
-        risk: 'medium', color: '#D97706',
+        risk: 'medium',
         riskScore: 48, riskLevel: 'Moderate',
         weatherCondition: 'Partly Cloudy', trafficLevel: 'High',
         delayMinutes: 16,
@@ -118,7 +120,7 @@
         eta: Math.round(baseEta * 1.22), etaText: `${Math.round(baseEta * 1.28)} mins`,
         distance: Math.round(distKm * 1.18), distanceText: `${Math.round(distKm * 1.18)} km`,
         weather: 20, congestion: 18, routeVulnerability: 22,
-        risk: 'low', color: '#059669',
+        risk: 'low',
         riskScore: 20, riskLevel: 'Low',
         weatherCondition: 'Clear', trafficLevel: 'Low',
         delayMinutes: 3,
@@ -134,7 +136,7 @@
         eta: Math.round(baseEta * 1.45), etaText: `${Math.round(baseEta * 1.5)} mins`,
         distance: Math.round(distKm * 1.32), distanceText: `${Math.round(distKm * 1.32)} km`,
         weather: 55, congestion: 80, routeVulnerability: 88,
-        risk: 'high', color: '#DC2626',
+        risk: 'high',
         riskScore: 78, riskLevel: 'High',
         weatherCondition: 'Heavy Rain', trafficLevel: 'Severe',
         delayMinutes: 35,

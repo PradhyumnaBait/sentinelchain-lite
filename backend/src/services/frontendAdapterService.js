@@ -60,7 +60,6 @@ function buildRouteCards({
       etaText: route.durationInTraffic || route.duration,
       distance: Math.round(route.distanceMeters / 1000),
       distanceText: route.distance,
-      color: risk === "high" ? "#DC2626" : risk === "medium" ? "#D97706" : "#059669",
       coords: (route.polyline || []).map((point) => [point.lat, point.lng]),
       risk,
       riskScore: payload?.riskScore || 0,
