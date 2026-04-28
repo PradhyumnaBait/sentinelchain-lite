@@ -339,7 +339,32 @@
           }
         };
       }
-      return realRunSimulation(source, destination, scenario, severity, mode);
+      try {
+        return await realRunSimulation(source, destination, scenario, severity, mode);
+      } catch(e) {
+        console.warn('[SCL API] Simulation backend unavailable, using mock:', e.message);
+        const mockRiskScore = severity === 'critical' ? 88 : severity === 'high' ? 72 : severity === 'medium' ? 55 : 35;
+        const routes = mockRoutes(source, destination);
+        const recommended = routes.find(r => r.isRecommended) || routes[0];
+        return {
+          frontend: {
+            simulation: { name: scenario, description: `${scenario} simulation (offline)`, severity },
+            recommendedRouteName: recommended.routeName,
+            aiPanel: {
+              riskScore: mockRiskScore,
+              riskLevel: mockRiskScore >= 75 ? 'High' : mockRiskScore >= 45 ? 'Moderate' : 'Low',
+              recommendation: {
+                headline: `Use ${recommended.routeName} under ${scenario} conditions`,
+                body: `Simulated ${scenario} at ${severity} severity. ${recommended.routeName} offers the best risk profile.`,
+              },
+            },
+            delayAvoided: `${Math.round(mockRiskScore * 0.25)} mins`,
+          },
+          riskScore: mockRiskScore,
+          recommendedRouteName: recommended.routeName,
+          delayAvoided: `${Math.round(mockRiskScore * 0.25)} mins`,
+        };
+      }
     },
 
     async fetchScenarios() {

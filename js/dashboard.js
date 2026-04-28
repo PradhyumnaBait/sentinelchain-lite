@@ -219,31 +219,6 @@
     }).addTo(state.map);
     window.L.control.zoom({ position: "topright" }).addTo(state.map);
     
-    // Add color-coded risk legend
-    const legend = window.L.control({ position: "bottomleft" });
-    legend.onAdd = function() {
-      const div = window.L.DomUtil.create("div", "map-legend");
-      div.innerHTML = `
-        <div style="background:white;padding:10px 12px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.15);font-size:12px;font-family:system-ui;">
-          <div style="font-weight:600;margin-bottom:6px;color:#1e293b;">Route Risk Level</div>
-          <div style="display:flex;align-items:center;margin:4px 0;">
-            <div style="width:20px;height:4px;background:#10b981;border-radius:2px;margin-right:8px;"></div>
-            <span style="color:#475569;">Low (0-34)</span>
-          </div>
-          <div style="display:flex;align-items:center;margin:4px 0;">
-            <div style="width:20px;height:4px;background:#f59e0b;border-radius:2px;margin-right:8px;"></div>
-            <span style="color:#475569;">Moderate (35-64)</span>
-          </div>
-          <div style="display:flex;align-items:center;margin:4px 0;">
-            <div style="width:20px;height:4px;background:#ef4444;border-radius:2px;margin-right:8px;"></div>
-            <span style="color:#475569;">High (65+)</span>
-          </div>
-        </div>
-      `;
-      return div;
-    };
-    legend.addTo(state.map);
-    
     // Expose instance globally so global.js can call invalidateSize on panel resize
     window._sclMap = state.map;
     // Force Leaflet to recalculate container size after DOM is fully rendered
