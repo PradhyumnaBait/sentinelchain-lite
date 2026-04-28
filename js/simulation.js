@@ -143,19 +143,32 @@
       gaugeBadge.textContent = riskLbl(adjustedRisk);
     }
 
-    // Impact metrics
-    if (impactDelay) { impactDelay.textContent = delay;  impactDelay.style.color = 'var(--clr-risk-medium)'; }
+    // Impact metrics + mini-bars
+    if (impactDelay) {
+      impactDelay.textContent = delay;
+      impactDelay.style.color = 'var(--clr-risk-medium)';
+      const pct = Math.min(100, parseFloat(delay) / 10 * 100);
+      const delayParent = impactDelay.closest('.metric, .impact-item, td, div');
+      if (delayParent && !delayParent.querySelector('.mini-bar')) {
+        const bar = document.createElement('div');
+        bar.className = 'mini-bar';
+        bar.style.width = `${pct}%`;
+        delayParent.appendChild(bar);
+      } else if (delayParent?.querySelector('.mini-bar')) {
+        delayParent.querySelector('.mini-bar').style.width = `${pct}%`;
+      }
+    }
     if (impactCost)  { impactCost.textContent  = cost;   impactCost.style.color  = 'var(--clr-risk-medium)'; }
     if (impactRisk)  { impactRisk.textContent  = delta;  impactRisk.style.color  = riskColor(adjustedRisk); }
     if (impactAlt)   { impactAlt.textContent   = alt; }
     if (impactNote)  impactNote.textContent = note;
 
-    // Chart bars
+    // Chart bars — add risk-bar-box for staggered grow animation
     riskProfile.forEach((val, i) => {
       const bar = chartBars[i];
       if (!bar) return;
       bar.style.height = `${val}%`;
-      bar.className = val >= 70 ? 'chart-bar chart-bar--peak' : 'chart-bar';
+      bar.className = (val >= 70 ? 'chart-bar chart-bar--peak' : 'chart-bar') + ' risk-bar-box';
     });
 
     // Timeline
@@ -211,6 +224,10 @@
       state.severity = parseInt(severitySlider?.value ?? '50', 10);
       setRunning(true);
 
+      // Mark scenario card as active (LIVE indicator)
+      document.querySelectorAll('.scenario-active').forEach(el => el.classList.remove('scenario-active'));
+      scenarioSel?.closest('.card, .panel, .sim-card, section, div')?.classList.add('scenario-active');
+
       try {
         const result  = await runSimulation(scenarioKey, state.severity);
         state.result  = result;
@@ -242,6 +259,9 @@
       if (impactAlt)      impactAlt.textContent   = '—';
       if (impactNote)     impactNote.textContent  = 'Run a simulation to see the impact summary.';
       chartBars.forEach(b => { b.style.height = '10%'; b.className = 'chart-bar'; });
+      // Remove LIVE indicator
+      document.querySelectorAll('.scenario-active').forEach(el => el.classList.remove('scenario-active'));
+
     });
   }
 
