@@ -499,9 +499,9 @@
 /* ─── Phase 6: AI status typing system ──────────────── */
 .ai-status {
   position: absolute;
-  bottom: 12px;
-  left: 12px;
-  right: 12px;
+  top: 20px;
+  left: 20px;
+  right: auto;
   z-index: 10;
   display: flex;
   flex-direction: column;
@@ -561,4 +561,25 @@
 .ai-chip.show {
   opacity: 1;
   transform: translateY(0);
-}
+}
+
+/* Section 2 Phase 3: resolved confirmation line */
+.ai-resolved {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 10px;
+  color: #10b981;
+  letter-spacing: 0.04em;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.ai-resolved.show {
+  opacity: 0.85;
+  transform: translateY(0);
+}
+
+/* Section 5: SVG group icon movers */
+.hero-routes g.mover {
+  filter: drop-shadow(0 0 3px currentColor);
+}
+

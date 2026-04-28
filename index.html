@@ -106,21 +106,23 @@
             <text x="30"  y="265" class="svg-label">A</text>
             <text x="545" y="265" class="svg-label">B</text>
 
-            <!-- Movers: consistent shapes, no CDN dependency -->
-            <circle class="mover low"  r="5" fill="#10b981"/>
-            <rect   class="mover med"  width="10" height="6" fill="#f59e0b" rx="1"/>
-            <circle class="mover high" r="5" fill="#ef4444"/>
+            <!-- Movers: semantic SVG icon groups, moved by JS via transform -->
+            <!-- Low → Airplane shape -->
+            <g class="mover low" transform="translate(-99,-99)" color="#10b981">
+              <polygon points="0,-6 2,2 0,1 -2,2" fill="#10b981"/>
+              <polygon points="-5,0 5,0 4,2 -4,2" fill="#10b981" opacity="0.7"/>
+            </g>
+            <!-- Med → Ship shape -->
+            <g class="mover med" transform="translate(-99,-99)" color="#f59e0b">
+              <rect x="-5" y="-1" width="10" height="5" rx="2" fill="#f59e0b"/>
+              <rect x="-2" y="-5" width="4" height="4" rx="1" fill="#f59e0b" opacity="0.75"/>
+            </g>
+            <!-- High → Warning triangle -->
+            <g class="mover high" transform="translate(-99,-99)" color="#ef4444">
+              <polygon points="0,-6 6,5 -6,5" fill="#ef4444" opacity="0.9"/>
+              <text x="0" y="4" text-anchor="middle" font-size="5" font-weight="900" fill="white" font-family="sans-serif">!</text>
+            </g>
           </svg>
-
-          <!-- Risk / Safe badges -->
-          <div class="map-mock__badge badge--risk" aria-label="Risk score">
-            <span class="badge__icon">⚠</span>
-            <span class="badge__text">Risk: High</span>
-          </div>
-          <div class="map-mock__badge badge--safe" aria-label="Safe score">
-            <span class="badge__icon">✓</span>
-            <span class="badge__text">AI Routed</span>
-          </div>
 
           <!-- Phase 6: AI typing status -->
           <div class="ai-status" id="ai-status-bar" aria-live="polite">
@@ -133,6 +135,7 @@
               <span class="ai-chip" data-chip="1">Ports ✓</span>
               <span class="ai-chip" data-chip="2">Conflict ✓</span>
             </div>
+            <span class="ai-resolved" id="ai-resolved">● Optimal route identified</span>
           </div>
         </div>
       </div>

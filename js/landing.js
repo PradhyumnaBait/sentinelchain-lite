@@ -81,8 +81,9 @@
     if (window.__aiTypingBound) return;
     window.__aiTypingBound = true;
 
-    const typingEl = document.getElementById('ai-typing');
-    const chipsEl  = document.getElementById('ai-chips');
+    const typingEl  = document.getElementById('ai-typing');
+    const chipsEl   = document.getElementById('ai-chips');
+    const resolvedEl = document.getElementById('ai-resolved');
     if (!typingEl || !chipsEl) return;
 
     const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -92,6 +93,7 @@
       typingEl.textContent = msg;
       chipsEl.classList.add('visible');
       chipsEl.querySelectorAll('.ai-chip').forEach(c => c.classList.add('show'));
+      if (resolvedEl) resolvedEl.classList.add('show');
       return;
     }
 
@@ -101,8 +103,7 @@
       const timer = setInterval(() => {
         if (i >= msg.length) {
           clearInterval(timer);
-          // Phase 9: chips appear at 2.5s from page load (~2s after typing starts)
-          setTimeout(showChips, 2000);
+          setTimeout(showChips, 2000); // chips at ~2.5s
           return;
         }
         typingEl.textContent = msg.slice(0, ++i);
@@ -111,9 +112,16 @@
 
     function showChips() {
       chipsEl.classList.add('visible');
-      chipsEl.querySelectorAll('.ai-chip').forEach((chip, idx) => {
+      const chips = chipsEl.querySelectorAll('.ai-chip');
+      chips.forEach((chip, idx) => {
         setTimeout(() => chip.classList.add('show'), idx * 150);
       });
+      // Phase 3: resolved line appears 800ms after last chip
+      setTimeout(showResolved, chips.length * 150 + 800);
+    }
+
+    function showResolved() {
+      if (resolvedEl) resolvedEl.classList.add('show');
     }
   }
 
@@ -126,7 +134,7 @@
     }
   }
 
-  /* ── Phase 3+9: Mover RAF (starts at 6s) ───────── */
+  /* ── Section 5+6: Mover RAF using transform translate ── */
   function animateRoutes() {
     if (window.__heroRoutesAnimBound) return;
     window.__heroRoutesAnimBound = true;
@@ -146,18 +154,22 @@
       const poly = document.querySelector(cfg.id);
       const dot  = document.querySelector(cfg.dot);
       if (!poly || !dot) return null;
+      // <g> groups use transform="translate(x,y)"; circles use cx/cy; rects use x/y
       const tag = dot.tagName.toLowerCase();
+      const isGroup      = tag === 'g';
       const isPositional = tag === 'image' || tag === 'rect';
-      return { pts: poly.points, dot, speed: cfg.speed, i: 0, t: 0, isPositional };
+      return { pts: poly.points, dot, speed: cfg.speed, i: 0, t: 0, isGroup, isPositional };
     }).filter(Boolean);
 
     if (!runners.length) return;
 
     if (reduced) {
+      // Place icons at start of their routes
       runners.forEach(r => {
         const p = r.pts.getItem(0);
         if (!p) return;
-        if (r.isPositional) { r.dot.setAttribute('x', p.x - 5); r.dot.setAttribute('y', p.y - 3); }
+        if (r.isGroup)      r.dot.setAttribute('transform', `translate(${p.x},${p.y})`);
+        else if (r.isPositional) { r.dot.setAttribute('x', p.x - 5); r.dot.setAttribute('y', p.y - 3); }
         else { r.dot.setAttribute('cx', p.x); r.dot.setAttribute('cy', p.y); }
       });
       return;
@@ -173,10 +185,12 @@
         if (r.i >= total - 1) { r.i = 0; r.t = 0; }
         const p1 = r.pts.getItem(r.i);
         const p2 = r.pts.getItem(r.i + 1);
-        const x = p1.x + (p2.x - p1.x) * r.t;
-        const y = p1.y + (p2.y - p1.y) * r.t;
-        if (r.isPositional) { r.dot.setAttribute('x', x - 5); r.dot.setAttribute('y', y - 3); }
-        else { r.dot.setAttribute('cx', x); r.dot.setAttribute('cy', y); }
+        const x  = p1.x + (p2.x - p1.x) * r.t;
+        const y  = p1.y + (p2.y - p1.y) * r.t;
+        // Move group icons via translate; fallback for other element types
+        if (r.isGroup)           r.dot.setAttribute('transform', `translate(${x},${y})`);
+        else if (r.isPositional) { r.dot.setAttribute('x', x - 5); r.dot.setAttribute('y', y - 3); }
+        else                     { r.dot.setAttribute('cx', x); r.dot.setAttribute('cy', y); }
       });
       rafId = requestAnimationFrame(frame);
     }
