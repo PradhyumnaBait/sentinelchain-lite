@@ -307,17 +307,25 @@ function bindGlobalActions() {
         layout?.classList.remove('ai-open');
         document.getElementById('ai-panel-toggle')?.setAttribute('aria-expanded', 'false');
       }
-      if (action === 'history') { e.preventDefault(); openHistory(); }
-      if (action === 'alerts') { e.preventDefault(); openAlerts(); }
-      if (action === 'settings') { e.preventDefault(); openSettings(); }
+      if (action === 'history')  { e.preventDefault(); document.body.classList.add('panel-open'); openHistory();  }
+      if (action === 'alerts')   { e.preventDefault(); document.body.classList.add('panel-open'); openAlerts();   }
+      if (action === 'settings') { e.preventDefault(); document.body.classList.add('panel-open'); openSettings(); }
     });
+
+    // Remove panel-open class when any modal overlay is dismissed
+    const overlayObserver = new MutationObserver(() => {
+      if (!document.querySelector('.notify-modal-overlay')) {
+        document.body.classList.remove('panel-open');
+      }
+    });
+    overlayObserver.observe(document.body, { childList: true, subtree: false });
   }
   // Fallback ID-based sidebar links (for pages without data-action)
   if (!window.__sidebarFallbackBound) {
     window.__sidebarFallbackBound = true;
-    document.getElementById('sidebar-history')?.addEventListener('click', e => { e.preventDefault(); openHistory(); });
-    document.getElementById('sidebar-alerts')?.addEventListener('click', e => { e.preventDefault(); openAlerts(); });
-    document.getElementById('sidebar-settings')?.addEventListener('click', e => { e.preventDefault(); openSettings(); });
+    document.getElementById('sidebar-history')?.addEventListener('click', e  => { e.preventDefault(); document.body.classList.add('panel-open'); openHistory();  });
+    document.getElementById('sidebar-alerts')?.addEventListener('click',  e  => { e.preventDefault(); document.body.classList.add('panel-open'); openAlerts();   });
+    document.getElementById('sidebar-settings')?.addEventListener('click', e => { e.preventDefault(); document.body.classList.add('panel-open'); openSettings(); });
   }
   // Home map
   initHomeMap();

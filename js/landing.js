@@ -110,8 +110,10 @@
       const poly = document.querySelector(cfg.id);
       const dot  = document.querySelector(cfg.dot);
       if (!poly || !dot) return null;
-      const isImage = dot.tagName.toLowerCase() === 'image';
-      return { pts: poly.points, dot, speed: cfg.speed, i: 0, t: 0, isImage };
+      // rect/image use x/y positional attrs; circle uses cx/cy
+      const tag = dot.tagName.toLowerCase();
+      const isPositional = tag === 'image' || tag === 'rect';
+      return { pts: poly.points, dot, speed: cfg.speed, i: 0, t: 0, isPositional };
     }).filter(Boolean);
 
     if (!runners.length) return;
@@ -120,8 +122,7 @@
       runners.forEach(r => {
         const p = r.pts.getItem(0);
         if (!p) return;
-        // Icon (image) uses x/y; circle uses cx/cy
-        if (r.isImage) { r.dot.setAttribute('x', p.x - 7); r.dot.setAttribute('y', p.y - 7); }
+        if (r.isPositional) { r.dot.setAttribute('x', p.x - 5); r.dot.setAttribute('y', p.y - 3); }
         else { r.dot.setAttribute('cx', p.x); r.dot.setAttribute('cy', p.y); }
       });
       return;
@@ -141,8 +142,8 @@
         const p2 = r.pts.getItem(r.i + 1);
         const x = p1.x + (p2.x - p1.x) * r.t;
         const y = p1.y + (p2.y - p1.y) * r.t;
-        // Icon (image) uses x/y with centering offset; circle uses cx/cy
-        if (r.isImage) { r.dot.setAttribute('x', x - 7); r.dot.setAttribute('y', y - 7); }
+        // rect/image: use x/y with centering offset; circle: use cx/cy
+        if (r.isPositional) { r.dot.setAttribute('x', x - 5); r.dot.setAttribute('y', y - 3); }
         else { r.dot.setAttribute('cx', x); r.dot.setAttribute('cy', y); }
       });
       rafId = requestAnimationFrame(frame);

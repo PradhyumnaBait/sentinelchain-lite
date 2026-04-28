@@ -1182,22 +1182,22 @@ button:active {
   }
 }
 
-/* ══ PART 2 — GLASSMORPHISM (controlled, key surfaces) ═══ */
+/* ══ PART 1 — GLASSMORPHISM (visible, controlled) ════════ */
 .card,
 .sidebar,
 .ai-panel,
 .notify-modal,
 .route-card {
-  --glass-bg: rgba(15, 23, 42, 0.6);
-  --glass-border: rgba(255,255,255,0.12);
+  --glass-bg: rgba(15, 23, 42, 0.45);
+  --glass-border: rgba(255,255,255,0.14);
 
   background: var(--glass-bg) !important;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   border: 1px solid var(--glass-border);
   box-shadow:
-    0 10px 30px rgba(0,0,0,0.35),
-    inset 0 1px rgba(255,255,255,0.05);
+    0 12px 32px rgba(0,0,0,0.4),
+    inset 0 1px rgba(255,255,255,0.06);
 }
 
 /* AI panel: extra depth — above everything */
@@ -1206,8 +1206,22 @@ button:active {
   -webkit-backdrop-filter: blur(18px);
 }
 
-/* ══ PART 4 — SLOW SPRING PANEL TRANSITIONS ═════════ */
-.ai-panel,
+/* Frosted backdrop when sidebar panels are open */
+body.panel-open::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 15, 25, 0.35);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 50;
+  pointer-events: none;
+}
+
+/* ══ PART 4 — PANEL TRANSITIONS ═════════════════════ */
+.ai-panel {
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
 .notify-modal-overlay .notify-modal {
   transition:
     transform 0.7s cubic-bezier(0.22, 1.1, 0.36, 1),
@@ -1224,18 +1238,28 @@ button:active {
 }
 
 /* ══ PART 5 — MICRO UI POLISH ════════════════════════ */
-/* Hero subtext contrast */
 .hero__subtext {
   color: rgba(255,255,255,0.75);
 }
 
-/* Card hover depth */
 .feature-card:hover,
 .card:hover {
   transform: translateY(-3px);
 }
 
-/* ══ PART 6 — SIMULATION TAB ENHANCEMENTS ════════════ */
+/* ══ SIMULATION ══════════════════════════════════════ */
+.sim-card {
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.sim-card:hover {
+  transform: translateY(-3px);
+}
+.progress-bar {
+  transition: width 0.6s ease;
+}
 .sim-bar {
   transform: scaleY(0);
   transform-origin: bottom;
@@ -1244,7 +1268,6 @@ button:active {
 .sim-bar.active {
   transform: scaleY(1);
 }
-
 .timeline-dot.high {
   animation: timeline-pulse 2s infinite;
 }

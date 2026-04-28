@@ -139,9 +139,11 @@ async function generateRoutes(origin, destination) {
     { ...fallback[0], name:'Direct — '+origin+' to '+destination, origin, destination,
       coords:[start,end], distance:dist, eta:Math.round(dist/600) },
     { ...fallback[1], name:'Indirect — via waypoint', origin, destination,
-      coords:[start,[mid[0]-5,mid[1]+10],end], distance:Math.round(dist*1.4), eta:Math.round(dist*1.4/600) },
+      coords:[start,[mid[0]+(end[0]-start[0])*0.15, mid[1]-(end[1]-start[1])*0.12],end],
+      distance:Math.round(dist*1.4), eta:Math.round(dist*1.4/600) },
     { ...fallback[2], name:'High-speed — narrow corridor', origin, destination,
-      coords:[start,[mid[0]+8,mid[1]-8],end], distance:Math.round(dist*0.9), eta:Math.round(dist*0.9/600) }
+      coords:[start,[mid[0]-(end[0]-start[0])*0.1, mid[1]+(end[1]-start[1])*0.08],end],
+      distance:Math.round(dist*0.9), eta:Math.round(dist*0.9/600) }
   ];
 }
 
@@ -302,34 +304,54 @@ function drawAllRoutes() {
   });
 }
 
-/* ══ PART 10 — HIGHLIGHT ROUTE (fitBounds) ═════════ */
+/* ══ PART 10 — HIGHLIGHT ROUTE (fitBounds + RAF draw) ══ */
 function highlightRoute(route) {
   if (!mapInstance || !route) return;
-  if (routeDrawTimer) {
-    clearTimeout(routeDrawTimer);
-    routeDrawTimer = null;
-  }
+
+  // Cancel any pending draw timer
+  if (routeDrawTimer) { clearTimeout(routeDrawTimer); routeDrawTimer = null; }
   try { if (routeLayer) { mapInstance.removeLayer(routeLayer); routeLayer = null; } } catch(_) {}
-  // Style all polylines
-  for (const [rid, poly] of Object.entries(polylines)) {
+
+  // Part 3: CLEAR ALL polyline layers (no random leftover lines)
+  mapInstance.eachLayer(layer => {
     try {
-      const r   = state.routes.find(x=>x.id===rid) || ROUTES_DATA.find(x=>x.id===rid);
-      const col = r ? (r.color || getRiskColor(r.riskScore||0)) : '#64748B';
-      const act = rid === route.id;
-      poly.setStyle({ color:col, weight:act?7:3, opacity:act?1:0.35 });
-      if (act) poly.bringToFront();
+      if (layer instanceof L.Polyline) mapInstance.removeLayer(layer);
     } catch(_) {}
-  }
-  // If route has real coords, draw dedicated layer + fitBounds
-  if (Array.isArray(route.coords) && route.coords.length >= 2) {
-    try {
-      const bounds = L.latLngBounds(route.coords);
-      mapInstance.fitBounds(bounds, { padding:[40,40], maxZoom:8 });
-      routeLayer = drawRouteAnimated(mapInstance, route.coords, {
-        color: getRiskColor(route.riskScore||0), weight:5, opacity:0.9
-      });
-    } catch(e) { console.warn('[SCL] fitBounds failed:', e); }
-  }
+  });
+  // Tile layer will survive (it's TileLayer, not Polyline)
+
+  if (!Array.isArray(route.coords) || route.coords.length < 2) return;
+
+  try {
+    const bounds = L.latLngBounds(route.coords);
+    mapInstance.fitBounds(bounds, { padding:[40,40], maxZoom:8 });
+
+    const color = getRiskColor(route.riskScore || 0);
+    const line  = L.polyline([route.coords[0]], { color, weight:5, opacity:0.9 }).addTo(mapInstance);
+    routeLayer  = line;
+
+    // Part 3: RAF-based smooth draw animation
+    let progress = 0;
+    const coords = route.coords;
+    const total  = coords.length;
+
+    function drawFrame() {
+      progress += 0.025;
+      if (progress >= 1) { line.setLatLngs(coords); return; }
+
+      const rawIdx = progress * (total - 1);
+      const i      = Math.floor(rawIdx);
+      const frac   = rawIdx - i;
+      const p1     = coords[Math.min(i,     total - 1)];
+      const p2     = coords[Math.min(i + 1, total - 1)];
+      const lat    = p1[0] + (p2[0] - p1[0]) * frac;
+      const lng    = p1[1] + (p2[1] - p1[1]) * frac;
+
+      line.setLatLngs([...coords.slice(0, i + 1), [lat, lng]]);
+      requestAnimationFrame(drawFrame);
+    }
+    requestAnimationFrame(drawFrame);
+  } catch(e) { console.warn('[SCL] highlightRoute failed:', e); }
 }
 
 /* ══ PART 6 — ROUTE CARDS RENDER ════════════════════ */
@@ -481,9 +503,10 @@ async function analyzeRoute() {
     try {
       const [start, end] = await Promise.all([getCoords(src), getCoords(dest)]);
       const mid = [(start[0]+end[0])/2, (start[1]+end[1])/2];
+      const dLat = end[0]-start[0], dLon = end[1]-start[1];
       routes[0].coords = [start, end];
-      routes[1].coords = [start, [mid[0]-5, mid[1]+10], end];
-      routes[2].coords = [start, [mid[0]+8, mid[1]-8], end];
+      routes[1].coords = [start, [mid[0]+dLat*0.15, mid[1]-dLon*0.12], end];
+      routes[2].coords = [start, [mid[0]-dLat*0.1, mid[1]+dLon*0.08], end];
     } catch(_) { /* keep preset coords */ }
     routes.forEach(r => {
       r.riskScore = calculateRisk(r);

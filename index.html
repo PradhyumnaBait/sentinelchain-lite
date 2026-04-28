@@ -88,26 +88,28 @@
         <div class="map-mock" id="hero-map-mock">
           <div class="map-mock__grid" aria-hidden="true"></div>
 
-          <!-- SVG Route System (polyline, sharp segments) -->
+          <!-- SVG Route System -->
           <svg class="hero-routes" viewBox="0 0 600 300" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+
             <!-- LOW RISK (green) -->
-            <polyline id="route-low"
-              points="40,200 150,140 260,170 380,130 540,180" />
+            <polyline id="route-low" points="40,200 150,140 260,170 380,130 540,180" />
+            <text x="30"  y="205" class="svg-label">A</text>
+            <text x="545" y="185" class="svg-label">B</text>
+
             <!-- MEDIUM RISK (yellow) -->
-            <polyline id="route-med"
-              points="40,230 170,210 300,160 420,200 540,210" />
+            <polyline id="route-med" points="40,230 170,210 300,160 420,200 540,210" />
+            <text x="30"  y="235" class="svg-label">A</text>
+            <text x="545" y="215" class="svg-label">B</text>
+
             <!-- HIGH RISK (red) -->
-            <polyline id="route-high"
-              points="40,260 180,220 320,240 420,180 540,260" />
+            <polyline id="route-high" points="40,260 180,220 320,240 420,180 540,260" />
+            <text x="30"  y="265" class="svg-label">A</text>
+            <text x="545" y="265" class="svg-label">B</text>
 
-            <!-- Moving icons (replace circles for technical look) -->
-            <image class="mover low"  href="https://cdn-icons-png.flaticon.com/512/684/684908.png"  width="14" height="14"/>
-            <image class="mover med"  href="https://cdn-icons-png.flaticon.com/512/252/252025.png"  width="14" height="14"/>
-            <image class="mover high" href="https://cdn-icons-png.flaticon.com/512/565/565547.png"  width="14" height="14"/>
-
-            <!-- A/B Labels -->
-            <text x="22"  y="200" class="svg-label">A</text>
-            <text x="548" y="180" class="svg-label">B</text>
+            <!-- Movers: consistent shapes, no CDN dependency -->
+            <circle class="mover low"  r="5" fill="#10b981"/>
+            <rect   class="mover med"  width="10" height="6" fill="#f59e0b" rx="1"/>
+            <circle class="mover high" r="5" fill="#ef4444"/>
           </svg>
 
           <!-- Risk / Safe badges -->
