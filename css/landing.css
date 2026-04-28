@@ -642,4 +642,93 @@
 
 /* Step 9: grid opacity */
 .map-mock__grid { opacity: 0.4; }
+
+/* ─── Phases 5–10: Premium depth + interactions ────── */
+
+/* Phase 5: route shimmer — applied via JS class AFTER draw animation
+   (avoids conflict with stroke-dasharray:1200 draw animation) */
+.route-shimmer {
+  stroke-dasharray: 8 5 !important;
+  animation: routeShimmer 2.5s linear infinite !important;
+}
+@keyframes routeShimmer {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: -52; }
+}
+
+/* Phase 6: heat overlay */
+.heat-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background:
+    radial-gradient(circle at 70% 45%, rgba(239,68,68,0.12), transparent 40%),
+    radial-gradient(circle at 38% 62%, rgba(245,158,11,0.10), transparent 38%),
+    radial-gradient(circle at 18% 32%, rgba(16,185,129,0.09), transparent 38%);
+  filter: blur(28px);
+  opacity: 0.65;
+  border-radius: inherit;
+}
+
+/* Phase 7: ai-status position */
+.ai-status {
+  top: 18px;
+  left: 18px;
+  right: auto;
+}
+.ai-status__line {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.88);
+}
+
+/* Phase 8: map-insights cluster */
+.map-insights {
+  position: absolute;
+  top: 18px;
+  left: 230px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 11px;
+  color: rgba(255,255,255,0.55);
+  z-index: 10;
+  pointer-events: none;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  letter-spacing: 0.02em;
+}
+.map-insights span {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 20px;
+  padding: 2px 8px;
+}
+
+/* Phase 9: ai-metrics glass pill */
+.ai-metrics {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(0,0,0,0.35);
+  border-radius: 10px;
+  padding: 8px 14px;
+  border: 1px solid rgba(255,255,255,0.06);
+  font-size: 11px;
+}
+
+/* Phase 10: card hover lift */
+.feature-card:hover,
+.card:hover {
+  transform: translateY(-4px);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  box-shadow:
+    0 18px 40px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+}
+.nav-link:hover {
+  background: rgba(255,255,255,0.05);
+  border-radius: 8px;
+  padding-left: 6px;
+  padding-right: 6px;
+}
 

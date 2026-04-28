@@ -207,4 +207,38 @@
 
   animateRoutes();
 
+  /* ── Phase 4: Mousemove parallax on hero box ────── */
+  (function initParallax() {
+    const preview = document.querySelector('.hero__map-preview');
+    if (!preview) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    // Perspective must be on the parent for rotateX/Y to show depth
+    const parent = preview.parentElement;
+    if (parent) parent.style.perspective = '1200px';
+
+    preview.style.transition = 'transform 0.12s ease-out';
+    preview.style.willChange = 'transform';
+
+    preview.addEventListener('mousemove', e => {
+      const rect = preview.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width  - 0.5;
+      const y = (e.clientY - rect.top)  / rect.height - 0.5;
+      preview.style.transform = `rotateX(${y * -5}deg) rotateY(${x * 5}deg) scale(1.02)`;
+    });
+
+    preview.addEventListener('mouseleave', () => {
+      preview.style.transition = 'transform 0.5s ease';
+      preview.style.transform  = 'rotateX(0) rotateY(0) scale(1)';
+      setTimeout(() => { preview.style.transition = 'transform 0.12s ease-out'; }, 500);
+    });
+  })();
+
+  /* ── Phase 5: Route shimmer (after draw completes at ~7s) ── */
+  setTimeout(() => {
+    document.querySelectorAll('#route-low, #route-med, #route-high').forEach(el => {
+      el.classList.add('route-shimmer');
+    });
+  }, 7200);
+
 })();

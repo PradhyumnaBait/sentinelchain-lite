@@ -1476,23 +1476,24 @@ textarea:focus {
 
 /* Steps 1+2 — Full-depth background system */
 
-/* Step 1: dual radial glow on body (GPU-safe, no repaints) */
+/* Step 1: dual radial glow on body */
 body {
   background:
-    radial-gradient(1200px 600px at 75% 30%, rgba(59,130,246,0.12), transparent 60%),
+    radial-gradient(1200px 600px at 75% 30%, rgba(59,130,246,0.10), transparent 60%),
     radial-gradient(900px 500px at 20% 70%, rgba(16,185,129,0.08), transparent 60%),
     #020617 !important;
 }
 
-/* Step 1: grid overlay — replaces the single weak radial */
+/* Phase 3: global grid — 100px, subtle */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   background-image:
-    linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
-  background-size: 80px 80px;
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 100px 100px;
+  opacity: 0.45;
   pointer-events: none;
   z-index: 0;
 }
