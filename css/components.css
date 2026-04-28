@@ -1075,6 +1075,21 @@
 
 .card {
   transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--clr-border);
+}
+
+.card-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0; /* Allow flex children to shrink below content size */
 }
 
 .card:hover {
@@ -1646,4 +1661,4 @@ body::before {
 [data-theme="light"] .ai-status__line,
 [data-theme="light"] .ai-status__cursor { color: rgba(15,23,42,0.8); }
 [data-theme="light"] .heat-overlay      { opacity: 0.35; }
-
+

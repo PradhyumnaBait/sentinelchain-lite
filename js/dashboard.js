@@ -84,16 +84,24 @@
     return "low";
   }
 
-  function getRiskLabel(score) {
-    if (score >= 75) return "High Risk";
-    if (score >= 45) return "Medium Risk";
-    return "Low Risk";
+  /**
+   * Get risk-based color for route visualization.
+   * Green (0-34): Safe, low risk
+   * Orange (35-64): Moderate risk, caution advised
+   * Red (65-100): High risk, avoid if possible
+   */
+  function getRiskColor(score) {
+    if (score < 35) return "#10b981"; // Green - Safe
+    if (score < 65) return "#f59e0b"; // Orange - Moderate
+    return "#ef4444"; // Red - High risk
   }
 
-  function getRiskColor(score) {
-    if (score >= 75) return "#DC2626";
-    if (score >= 45) return "#D97706";
-    return "#059669";
+  function getRiskLabel(score) {
+    if (score < 15) return "Minimal";
+    if (score < 35) return "Low";
+    if (score < 60) return "Moderate";
+    if (score < 80) return "High";
+    return "Critical";
   }
 
   function showAlert(message, type = "warning") {
@@ -210,6 +218,32 @@
       maxZoom: 18,
     }).addTo(state.map);
     window.L.control.zoom({ position: "topright" }).addTo(state.map);
+    
+    // Add color-coded risk legend
+    const legend = window.L.control({ position: "bottomleft" });
+    legend.onAdd = function() {
+      const div = window.L.DomUtil.create("div", "map-legend");
+      div.innerHTML = `
+        <div style="background:white;padding:10px 12px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.15);font-size:12px;font-family:system-ui;">
+          <div style="font-weight:600;margin-bottom:6px;color:#1e293b;">Route Risk Level</div>
+          <div style="display:flex;align-items:center;margin:4px 0;">
+            <div style="width:20px;height:4px;background:#10b981;border-radius:2px;margin-right:8px;"></div>
+            <span style="color:#475569;">Low (0-34)</span>
+          </div>
+          <div style="display:flex;align-items:center;margin:4px 0;">
+            <div style="width:20px;height:4px;background:#f59e0b;border-radius:2px;margin-right:8px;"></div>
+            <span style="color:#475569;">Moderate (35-64)</span>
+          </div>
+          <div style="display:flex;align-items:center;margin:4px 0;">
+            <div style="width:20px;height:4px;background:#ef4444;border-radius:2px;margin-right:8px;"></div>
+            <span style="color:#475569;">High (65+)</span>
+          </div>
+        </div>
+      `;
+      return div;
+    };
+    legend.addTo(state.map);
+    
     // Expose instance globally so global.js can call invalidateSize on panel resize
     window._sclMap = state.map;
     // Force Leaflet to recalculate container size after DOM is fully rendered
@@ -236,7 +270,9 @@
     state.routes.forEach((route) => {
       if (!route.coords || route.coords.length < 2) return;
       const selected = route.id === state.selectedRouteId;
-      const riskColor = route.color || getRiskColor(route.riskScore || 0);
+      
+      // Use risk-based color coding: Green (safe) → Orange (moderate) → Red (high risk)
+      const riskColor = getRiskColor(route.riskScore || 0);
 
       // Normalize coords: accept both [[lat,lng]] and [{lat,lng}] formats
       const latLngs = route.coords.map((c) =>
@@ -245,19 +281,28 @@
 
       const layer = window.L.polyline(latLngs, {
         color: riskColor,
-        weight: selected ? 7 : 3,
-        opacity: selected ? 1.0 : 0.45,
+        weight: selected ? 7 : 4,
+        opacity: selected ? 1.0 : 0.6,
+        className: selected ? 'route-selected' : 'route-normal',
       }).addTo(state.map);
 
       if (selected) layer.bringToFront();
 
       const routeDisplayName = route.routeName || route.name || route.label || route.id;
       const riskLevelText = route.riskLevel || getRiskLabel(route.riskScore || 0);
+      
+      // Enhanced popup with color-coded risk indicator
+      const riskBadgeColor = riskColor;
       layer.bindPopup(
-        `<strong>${routeDisplayName}</strong><br>` +
-        `Risk: ${riskLevelText} (${route.riskScore || 0}/100)<br>` +
-        `ETA: ${route.etaText || route.eta + " mins" || "N/A"}<br>` +
-        `Distance: ${route.distanceText || route.distance || "N/A"}`
+        `<div style="font-family:system-ui;">
+          <strong style="font-size:14px;">${routeDisplayName}</strong><br>
+          <div style="margin:6px 0;padding:4px 8px;background:${riskBadgeColor};color:white;border-radius:4px;display:inline-block;font-size:12px;font-weight:600;">
+            ${riskLevelText} Risk (${route.riskScore || 0}/100)
+          </div><br>
+          <span style="font-size:13px;">⏱ ETA: ${route.etaText || route.eta + " mins" || "N/A"}</span><br>
+          <span style="font-size:13px;">📍 Distance: ${route.distanceText || route.distance || "N/A"}</span><br>
+          <span style="font-size:12px;color:#64748b;">🌤 ${route.weatherCondition || "N/A"} | 🚗 ${route.trafficLevel || "N/A"} traffic</span>
+        </div>`
       );
 
       state.routeLayers[route.id] = layer;
@@ -281,6 +326,17 @@
   function renderRouteCards() {
     if (!refs.routeCards) return;
     refs.routeCards.innerHTML = "";
+
+    if (!state.routes.length) {
+      refs.routeCards.innerHTML = `
+        <div style="grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--text-secondary);">
+          <div style="font-size:48px;margin-bottom:12px;">🗺️</div>
+          <div style="font-size:16px;font-weight:500;margin-bottom:8px;">No routes analyzed yet</div>
+          <div style="font-size:14px;">Enter source and destination above to get started</div>
+        </div>
+      `;
+      return;
+    }
 
     state.routes.forEach((route) => {
       const selected = route.id === state.selectedRouteId;

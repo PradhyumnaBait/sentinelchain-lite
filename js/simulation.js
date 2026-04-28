@@ -120,8 +120,12 @@
     (result.riskProfile || []).forEach((value, index) => {
       const bar = refs.chartBars[index];
       if (!bar) return;
-      bar.style.height = `${value}%`;
+      const maxVal = Math.max(...(result.riskProfile || []), 1);
+      const pct = (value / maxVal) * 100;
+      bar.style.height = `${pct}%`;
+      bar.style.minHeight = "4px"; // Ensure even zero values are visible
       bar.className = `chart-bar${value >= 75 ? " chart-bar--peak" : ""}`;
+      bar.title = `Step ${index + 1}: ${value}% risk`;
     });
 
     renderTimeline(result.timeline);
