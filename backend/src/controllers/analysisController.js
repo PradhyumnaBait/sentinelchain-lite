@@ -13,6 +13,7 @@ const trafficService = require("../services/trafficService");
 const riskBuilder = require("../services/riskBuilder");
 const geminiService = require("../services/geminiService");
 const { runAiPipeline } = require("../services/aiOrchestratorService");
+const { buildFrontendAnalysisView } = require("../services/frontendAdapterService");
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/analyze-route
@@ -60,6 +61,15 @@ const analyzeRoute = async (req, res, next) => {
     ]);
 
     const processingTime = Date.now() - startTime;
+    const frontend = buildFrontendAnalysisView({
+      routes,
+      riskPayloads: payloads,
+      recommendedRouteId,
+      recommendedRouteName,
+      delayAvoided,
+      aiAnalysis,
+      agenticAi,
+    });
 
     return res.status(200).json({
       success: true,
@@ -75,6 +85,7 @@ const analyzeRoute = async (req, res, next) => {
         delayAvoided,
         aiAnalysis,
         agenticAi,
+        frontend,
         processingTimeMs: processingTime,
         timestamp: new Date().toISOString(),
       },

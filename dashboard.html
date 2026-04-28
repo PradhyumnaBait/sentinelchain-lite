@@ -112,7 +112,7 @@
       <form class="route-form-bar" id="route-form" role="search" aria-label="Route input form" novalidate>
         <!-- Source -->
         <label for="input-source" class="sr-only">Origin</label>
-        <input id="input-source" class="form-input" type="text" placeholder="📍 Origin (city, port, address)"
+        <input id="input-source" class="form-input" type="text" placeholder="📍 Origin (hospital, warehouse, shelter)"
           autocomplete="off" aria-required="true" />
         <!-- Arrow -->
         <span class="route-form-arrow" aria-hidden="true">→</span>
@@ -120,20 +120,24 @@
         <label for="input-destination" class="sr-only">Destination</label>
         <input id="input-destination" class="form-input" type="text" placeholder="🏁 Destination" autocomplete="off"
           aria-required="true" />
-        <!-- Delivery type -->
-        <label for="delivery-type" class="sr-only">Delivery type</label>
-        <select id="delivery-type" class="form-select" aria-label="Delivery type">
-          <option value="">All modes</option>
-          <option value="sea">🚢 Sea</option>
-          <option value="air">✈ Air</option>
-          <option value="road">🚚 Road</option>
-          <option value="rail">🚂 Rail</option>
+        <!-- Travel mode -->
+        <label for="delivery-type" class="sr-only">Travel mode</label>
+        <select id="delivery-type" class="form-select" aria-label="Travel mode">
+          <option value="driving">Road Delivery</option>
+          <option value="walking">On-foot Courier</option>
+          <option value="bicycling">Bike Responder</option>
+          <option value="transit">Public Transit</option>
         </select>
         <!-- Submit -->
         <button type="submit" class="btn btn--primary" id="analyze-btn">
           Analyze Route
         </button>
       </form>
+      <div class="route-cards-overlay" id="demo-route-presets" role="list" aria-label="Demo route presets" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-top:-4px">
+        <button class="btn btn--ghost btn--sm" data-demo-route="urban-relief">Mumbai Hospital -> Pune Relief Camp</button>
+        <button class="btn btn--ghost btn--sm" data-demo-route="storm-corridor">Chennai Medical Hub -> Puducherry Shelter</button>
+        <button class="btn btn--ghost btn--sm" data-demo-route="hill-route">Guwahati Base -> Shillong Aid Center</button>
+      </div>
 
       <!-- AlertBanner (conditional, hidden by default) -->
       <div class="alert-banner alert-banner--warning" id="alert-banner" role="alert" aria-live="polite" hidden>

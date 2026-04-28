@@ -122,9 +122,8 @@ function saveSettings() {
   } catch (e) { console.error('[SCL global] saveSettings failed:', e); }
 }
 
-/* ── Home map: re-init guard + ship + live status ── */
+/* ── Home map: emergency route overview ───────────── */
 function initHomeMap() {
-  // Part 3: prevent re-initialization on re-run
   if (window.__homeMapInitialized) return;
   const el = document.getElementById('home-map');
   if (!el) return;
@@ -135,59 +134,57 @@ function initHomeMap() {
   }
   window.__homeMapInitialized = true;
   try {
-    const map = L.map('home-map').setView([20, 80], 3);
+    const map = L.map('home-map').setView([21.1, 78.5], 5);
     window.map = map;
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
-    // Zigzag trade route lines (less artificial than straight segments)
+
     const routeCoords = [
-      [[20, 60], [18, 70], [22, 80], [19, 90], [23, 100]],
-      [[15, 50], [18, 65], [16, 85], [20, 105]],
-      [[22, 78], [26, 92], [24, 108], [29, 122]]
+      [[19.076, 72.8777], [18.7041, 73.1025], [18.5204, 73.8567]],
+      [[28.6139, 77.2090], [28.4595, 77.0266], [27.1767, 78.0081]],
+      [[13.0827, 80.2707], [12.9165, 79.1325], [11.0168, 76.9558]]
     ];
     const colors = ['#3B82F6', '#F59E0B', '#10B981'];
-    const weights = [3, 2, 2];
-    const opacities = [0.8, 0.6, 0.55];
     routeCoords.forEach((r, i) => L.polyline(r, {
       color: colors[i],
-      weight: weights[i],
-      opacity: opacities[i]
+      weight: i === 0 ? 4 : 3,
+      opacity: i === 0 ? 0.85 : 0.65
     }).addTo(map));
-    // Port markers
-    [[19.08, 72.88, 'Mumbai'], [1.35, 103.82, 'Singapore'], [22.32, 114.17, 'Hong Kong'],
-    [51.51, -0.13, 'London'], [40.71, -74.01, 'New York']]
+
+    [[19.076, 72.8777, 'Mumbai Medical Hub'], [18.5204, 73.8567, 'Pune Relief Depot'],
+    [28.6139, 77.2090, 'Delhi Command Center'], [27.1767, 78.0081, 'Agra Aid Zone'],
+    [13.0827, 80.2707, 'Chennai Emergency Store'], [11.0168, 76.9558, 'Coimbatore Relief Base']]
       .forEach(([lat, lng, name]) =>
         L.circleMarker([lat, lng], { radius: 5, color: '#3B82F6', fillColor: '#93C5FD', fillOpacity: 1, weight: 2 })
           .bindTooltip(name, { permanent: false, direction: 'top' }).addTo(map));
-    // Part 3: animated ship along primary route
-    const shipRoute = [[19.08, 72.88], [1.35, 103.82], [22.32, 114.17], [31.23, 121.47]];
+
+    const convoyRoute = routeCoords[0];
     let progress = 0;
-    const ship = L.circleMarker(shipRoute[0], {
+    const convoy = L.circleMarker(convoyRoute[0], {
       radius: 6, color: '#ffffff', fillColor: '#3b82f6',
       fillOpacity: 1, weight: 2, className: 'ship-marker'
     }).addTo(map);
     function interpolate(t) {
-      const total = shipRoute.length - 1;
+      const total = convoyRoute.length - 1;
       const i = Math.min(Math.floor(t * total), total - 1);
       const frac = (t * total) - i;
-      const [la1, lo1] = shipRoute[i];
-      const [la2, lo2] = shipRoute[i + 1] || shipRoute[i];
+      const [la1, lo1] = convoyRoute[i];
+      const [la2, lo2] = convoyRoute[i + 1] || convoyRoute[i];
       return [la1 + (la2 - la1) * frac, lo1 + (lo2 - lo1) * frac];
     }
     let rafId;
-    function animateShip() {
-      progress = (progress + 0.0006) % 1;
-      ship.setLatLng(interpolate(progress));
-      rafId = requestAnimationFrame(animateShip);
+    function animateConvoy() {
+      progress = (progress + 0.0015) % 1;
+      convoy.setLatLng(interpolate(progress));
+      rafId = requestAnimationFrame(animateConvoy);
     }
-    animateShip();
-    // Stop RAF when page is hidden (memory/CPU efficiency)
+    animateConvoy();
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) { cancelAnimationFrame(rafId); }
-      else { animateShip(); }
+      else { animateConvoy(); }
     });
-    // Part 4: live intelligence status overlay
+
     if (!window.__statusInitialized) {
       window.__statusInitialized = true;
       const status = document.createElement('div');
@@ -196,13 +193,13 @@ function initHomeMap() {
       // Subtle static label to avoid "empty right-box" feel.
       const label = document.createElement('div');
       label.className = 'map-label';
-      label.textContent = 'Live Route Network';
+      label.textContent = 'Live Emergency Route Network';
       el.appendChild(label);
       const msgs = [
-        'Scanning weather systems…',
-        'Analyzing congestion nodes…',
-        'Evaluating geopolitical risks…',
-        'Optimizing safest route…',
+        'Scanning flood and storm alerts…',
+        'Analyzing traffic bottlenecks…',
+        'Evaluating route resilience…',
+        'Optimizing safest emergency path…',
         'AI recommendation ready ✔'
       ];
       let mi = 0;
@@ -211,60 +208,6 @@ function initHomeMap() {
     }
     setTimeout(() => { try { map.invalidateSize(); } catch (_) { } }, 400);
   } catch (e) { console.warn('[SCL global] home map failed:', e); }
-}
-
-function initHomeEnhancements() {
-  const mapEl = document.getElementById('home-map');
-  if (!mapEl) return;
-  if (window.__homeEnhanced) return;
-  window.__homeEnhanced = true;
-
-  if (typeof L === 'undefined' || !window.map) return;
-
-  const route1 = [
-    [20, 60],
-    [18, 72],
-    [22, 85],
-    [19, 98],
-    [23, 110]
-  ];
-  const route2 = [
-    [15, 55],
-    [19, 68],
-    [17, 82],
-    [21, 100]
-  ];
-
-  L.polyline(route1, {
-    color: '#3b82f6',
-    weight: 3,
-    opacity: 0.85
-  }).addTo(window.map);
-
-  L.polyline(route2, {
-    color: '#f59e0b',
-    weight: 2,
-    opacity: 0.65
-  }).addTo(window.map);
-
-  if (!window.__homePulseRunning) {
-    window.__homePulseRunning = true;
-    const pulse = L.circleMarker([20, 60], {
-      radius: 5,
-      color: '#3b82f6'
-    }).addTo(window.map);
-
-    let t = 0;
-    function animate() {
-      t += 0.002;
-      if (t > 1) t = 0;
-      const lat = 20 + (3 * Math.sin(t * Math.PI));
-      const lng = 60 + (40 * t);
-      pulse.setLatLng([lat, lng]);
-      requestAnimationFrame(animate);
-    }
-    requestAnimationFrame(animate);
-  }
 }
 
 function bindMapPopEffect() {
@@ -329,7 +272,6 @@ function bindGlobalActions() {
   }
   // Home map
   initHomeMap();
-  initHomeEnhancements();
   bindMapPopEffect();
   // Keep dashboard state deterministic on load/re-run
   const panel = document.getElementById('ai-panel');

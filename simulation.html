@@ -97,12 +97,10 @@
             <label class="form-label" for="scenario-select">Disruption Scenario</label>
             <select class="form-select" id="scenario-select" style="width:100%">
               <option value="">— Select Scenario —</option>
-              <option value="port-strike">⚓ Port Strike</option>
-              <option value="typhoon">🌀 Typhoon Warning</option>
-              <option value="conflict">💥 Armed Conflict Zone</option>
-              <option value="pandemic">🦠 Pandemic Lockdown</option>
-              <option value="customs">🛃 Customs Delay</option>
-              <option value="piracy">☠ Piracy Alert</option>
+              <option value="flood">Flood Simulation</option>
+              <option value="storm">Severe Storm Simulation</option>
+              <option value="traffic_accident">Major Accident Simulation</option>
+              <option value="normal">Normal Conditions</option>
             </select>
           </div>
 
@@ -126,7 +124,7 @@
 
           <!-- Duration -->
           <div class="form-group" id="form-group-duration">
-            <label class="form-label" for="duration-select">Estimated Duration</label>
+            <label class="form-label" for="duration-select">Response Window</label>
             <select class="form-select" id="duration-select" style="width:100%">
               <option value="1d">1 Day</option>
               <option value="3d">3 Days</option>
@@ -138,12 +136,12 @@
 
           <!-- Affected region -->
           <div class="form-group" id="form-group-region">
-            <label class="form-label" for="region-input">Affected Region</label>
+            <label class="form-label" for="region-input">Route Context</label>
             <input
               id="region-input"
               class="form-input"
               type="text"
-              placeholder="e.g. Singapore, Red Sea"
+              placeholder="e.g. Hospital A to Relief Camp B"
               style="width:100%"
             />
           </div>
@@ -162,10 +160,10 @@
           <h2 class="sim-panel-block__title" id="impact-heading">Impact Summary</h2>
           <div class="impact-metric" id="impact-delay">
             <span class="impact-metric__label">Delay Estimate</span>
-            <span class="impact-metric__value" id="impact-delay-val">+4.2 days</span>
+            <span class="impact-metric__value" id="impact-delay-val">+12 mins</span>
           </div>
           <div class="impact-metric" id="impact-cost">
-            <span class="impact-metric__label">Cost Increase</span>
+            <span class="impact-metric__label">Operational Strain</span>
             <span class="impact-metric__value impact-metric__value--warn" id="impact-cost-val">+18%</span>
           </div>
           <div class="impact-metric" id="impact-risk-delta">
@@ -177,7 +175,7 @@
             <span class="impact-metric__value impact-metric__value--safe" id="impact-alt-val">Route B</span>
           </div>
           <p class="impact-note" id="impact-note">
-            Under this scenario, Route A becomes critical. Route B via Cape of Good Hope is recommended.
+            Run a simulation to see how disruption conditions change the safest route.
           </p>
         </section>
 
@@ -278,6 +276,7 @@
   <!-- end .sim-root -->
 
   <script src="js/theme.js"></script>
+  <script src="js/api.js"></script>
   <script src="js/simulation.js"></script>
   <script src="js/global.js"></script>
 </body>

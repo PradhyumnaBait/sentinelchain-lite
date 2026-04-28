@@ -13,6 +13,7 @@ const riskBuilder = require("../services/riskBuilder");
 const geminiService = require("../services/geminiService");
 const simulationEngine = require("../services/simulationEngine");
 const { runAiPipeline } = require("../services/aiOrchestratorService");
+const { buildFrontendAnalysisView } = require("../services/frontendAdapterService");
 
 /**
  * POST /api/simulate
@@ -89,11 +90,21 @@ const runSimulation = async (req, res, next) => {
         routes: simRoutes,
         weatherDataList: simWeather,
         trafficDataList: simTraffic,
-        simulationScenario: normalizedScenario,
+        simulationScenario: "none",
       }),
     ]);
 
     const processingTime = Date.now() - startTime;
+    const frontend = buildFrontendAnalysisView({
+      routes: simRoutes,
+      riskPayloads: payloads,
+      recommendedRouteId,
+      recommendedRouteName,
+      delayAvoided,
+      aiAnalysis,
+      agenticAi,
+      simulation: scenarioMeta,
+    });
 
     return res.status(200).json({
       success: true,
@@ -110,6 +121,7 @@ const runSimulation = async (req, res, next) => {
         delayAvoided,
         aiAnalysis,
         agenticAi,
+        frontend,
         processingTimeMs: processingTime,
         timestamp: new Date().toISOString(),
       },

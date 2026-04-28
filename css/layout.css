@@ -204,7 +204,7 @@
   flex-direction: column;
   min-height: 0;
   overflow: hidden;            /* clips map + cards cleanly inside radius */
-  margin-bottom: 24px;
+  margin-bottom: 0;
 }
 [data-theme="light"] .map-panel {
   background: rgba(255,255,255,0.65);
@@ -331,7 +331,7 @@
 body::after {
   content: "";
   display: block;
-  height: 20px;   /* reduced from 40px */
+  height: 0;
 }
 .alert-banner {
   width: 100%;
@@ -366,9 +366,10 @@ body::after {
   width: 100%;
   max-width: var(--layout-max-width);
   margin-inline: auto;
-  height: 100vh;
+  min-height: 100vh;
   padding-top: var(--navbar-h);
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .sim-main {
@@ -377,8 +378,9 @@ body::after {
   display: flex;
   gap: var(--layout-gap);
   padding: var(--layout-padding);
-  height: 100%;
-  overflow: hidden;
+  min-height: calc(100vh - var(--navbar-h));
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .sim-left {
@@ -397,8 +399,9 @@ body::after {
   display: flex;
   flex-direction: column;
   gap: var(--layout-gap);
-  height: 100%;
-  overflow: hidden;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 /* ─── Tablet (≤1024px) ─────────────────────────── */

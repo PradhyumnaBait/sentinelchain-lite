@@ -235,23 +235,17 @@ async function getRoutes(source, destination, mode = "driving") {
     const data = response.data;
 
     if (data.status !== "OK") {
-      const err = new Error(`Google Directions API error: ${data.status}`);
-      err.statusCode = 502;
-      err.code = "MAPS_API_ERROR";
-      throw err;
+      console.warn(`[MapsService] Directions API returned ${data.status}; using mock route data`);
+      return getMockRoutes(source, destination);
     }
 
     if (!data.routes || data.routes.length === 0) {
-      const err = new Error("No routes found between the specified locations");
-      err.statusCode = 404;
-      err.code = "NO_ROUTES_FOUND";
-      throw err;
+      console.warn("[MapsService] No routes found; using mock route data");
+      return getMockRoutes(source, destination);
     }
 
     return data.routes.map((route, idx) => normaliseRoute(route, idx));
   } catch (err) {
-    if (err.code === "MAPS_API_ERROR" || err.code === "NO_ROUTES_FOUND") throw err;
-
     // Network/timeout error → graceful fallback
     console.warn("[MapsService] API unreachable, falling back to mock data:", err.message);
     return getMockRoutes(source, destination);

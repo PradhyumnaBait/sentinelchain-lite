@@ -7,6 +7,7 @@
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
+const path = require("path");
 const errorHandler = require("./middleware/errorHandler");
 
 // Routes
@@ -14,6 +15,7 @@ const routeRoutes = require("./routes/routeRoutes");
 const analysisRoutes = require("./routes/analysisRoutes");
 
 const app = express();
+const frontendRoot = path.resolve(__dirname, "..", "..");
 
 // ── Middleware ────────────────────────────────────────────────────────────────
 
@@ -38,9 +40,18 @@ app.use(
   morgan(process.env.NODE_ENV === "production" ? "combined" : "dev")
 );
 
+// ── Static Frontend ───────────────────────────────────────────────────────────
+
+app.use(
+  express.static(frontendRoot, {
+    extensions: ["html"],
+    index: "index.html",
+  })
+);
+
 // ── Health Check ──────────────────────────────────────────────────────────────
 
-app.get("/", (_req, res) => {
+app.get("/api", (_req, res) => {
   res.status(200).json({
     service: "SentinelChain Lite API",
     version: "1.0.0",
@@ -60,6 +71,21 @@ app.get("/", (_req, res) => {
 
 app.get("/health", (_req, res) => {
   res.status(200).json({ status: "healthy", timestamp: new Date().toISOString() });
+});
+
+app.get("/api/config", (_req, res) => {
+  res.status(200).json({
+    success: true,
+    data: {
+      modes: [
+        { value: "driving", label: "Road Delivery" },
+        { value: "walking", label: "On-foot Courier" },
+        { value: "bicycling", label: "Bike Responder" },
+        { value: "transit", label: "Public Transit" },
+      ],
+      severities: ["low", "medium", "high", "critical"],
+    },
+  });
 });
 
 // ── API Routes ────────────────────────────────────────────────────────────────

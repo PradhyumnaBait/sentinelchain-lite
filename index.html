@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="description" content="SentinelChain Lite — AI-powered supply chain risk routing platform. Optimize logistics with real-time intelligence." />
-<title>SentinelChain Lite — Intelligent Route Risk Platform</title>
+<meta name="description" content="SentinelChain Lite — AI-powered emergency routing assistant for safer disaster-response deliveries." />
+<title>SentinelChain Lite — Risk-Aware Emergency Routing</title>
 
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -49,15 +49,15 @@
 
 <!-- Left: Text + CTA -->
 <div class="hero__content">
-<p class="hero__eyebrow">AI-Powered Logistics Intelligence</p>
+<p class="hero__eyebrow">AI-Powered Emergency Route Intelligence</p>
 <h1 class="hero__headline" id="hero-headline">
 Route Smarter.<br />
-Ship Safer.<br />
+Respond Safer.<br />
 <span class="text-accent">Stay Ahead of Risk.</span>
 </h1>
 <p class="hero__subtext">
-SentinelChain Lite uses real-time AI analysis to score route risk, 
-predict disruptions, and recommend the safest path — before your shipment moves.
+SentinelChain Lite uses real-time AI analysis to score route risk,
+predict disruptions, and recommend the safest path for medical and relief deliveries.
 </p>
 <div class="hero__cta-group">
 <a href="dashboard.html" class="btn btn--primary btn--lg" id="hero-cta-start">
@@ -94,7 +94,7 @@ View Demo
 <!-- Phase 8: map insights cluster -->
 <div class="map-insights" aria-hidden="true">
 <span>🌤 Weather: Stable</span>
-<span>🚢 Port Delay: Low</span>
+<span>🚚 Traffic Delay: Moderate</span>
 </div>
 
 <!-- SVG Route System -->
@@ -141,8 +141,8 @@ View Demo
 </div>
 <div class="ai-chips" id="ai-chips">
 <span class="ai-chip" data-chip="0">Weather ✓</span>
-<span class="ai-chip" data-chip="1">Ports ✓</span>
-<span class="ai-chip" data-chip="2">Conflict ✓</span>
+<span class="ai-chip" data-chip="1">Traffic ✓</span>
+<span class="ai-chip" data-chip="2">Road Risk ✓</span>
 </div>
 <span class="ai-resolved" id="ai-resolved">● Optimal route identified</span>
 </div>
@@ -151,7 +151,7 @@ View Demo
 <div class="ai-metrics" aria-label="AI route metrics" role="status">
 <div>Risk Score: <span>72</span></div>
 <div>ETA Confidence: <span>94%</span></div>
-<div>Routes Evaluated: <span>12</span></div>
+<div>Routes Evaluated: <span>3</span></div>
 </div>
 </div>
 </div>
@@ -163,13 +163,13 @@ View Demo
 <section class="features-section" id="features" aria-labelledby="features-heading">
 <div class="container">
 <h2 class="section-heading" id="features-heading">Why SentinelChain?</h2>
-<p class="section-subtext">Intelligent tools built for modern supply chain operations.</p>
+<p class="section-subtext">Intelligent tools built for emergency logistics under disruption.</p>
 <div class="features-grid">
 
 <article class="feature-card" id="feature-risk">
 <div class="feature-card__icon" aria-hidden="true">🛡</div>
 <h3 class="feature-card__title">Real-Time Risk Scoring</h3>
-<p class="feature-card__desc">Every route is analyzed across 180+ live risk factors including weather, conflict, port delays, and geopolitical alerts.</p>
+<p class="feature-card__desc">Every route is analyzed across weather, congestion, route vulnerability, and disruption signals to guide emergency delivery decisions.</p>
 </article>
 
 <article class="feature-card" id="feature-ai">
@@ -181,7 +181,7 @@ View Demo
 <article class="feature-card" id="feature-sim">
 <div class="feature-card__icon" aria-hidden="true">⚡</div>
 <h3 class="feature-card__title">Scenario Simulation</h3>
-<p class="feature-card__desc">What if there's a port strike? A typhoon? Simulate disruptions and see how your route performs before committing.</p>
+<p class="feature-card__desc">What if flooding worsens? A storm intensifies? Simulate disruptions and see how route recommendations change before dispatch.</p>
 </article>
 
 <article class="feature-card" id="feature-map">
@@ -199,7 +199,7 @@ View Demo
 <article class="feature-card" id="feature-multimode">
 <div class="feature-card__icon" aria-hidden="true">🚚</div>
 <h3 class="feature-card__title">Multi-Modal Routing</h3>
-<p class="feature-card__desc">Sea, air, road, rail — analyze risk across any delivery type and find the safest mode combination.</p>
+<p class="feature-card__desc">Road, bike, on-foot courier, or transit — compare practical delivery modes for emergency operations.</p>
 </article>
 
 </div>
@@ -215,7 +215,7 @@ View Demo
 <span class="step-num" aria-hidden="true">01</span>
 <div class="step-content">
 <h3>Enter Your Route</h3>
-<p>Input origin, destination, and delivery type in the Route Form.</p>
+<p>Input origin, destination, and travel mode in the route form.</p>
 </div>
 </li>
 <li class="how-step" id="step-2">
@@ -247,12 +247,12 @@ View Demo
 <section class="section" id="demo" aria-labelledby="demo-heading" style="padding:80px 0;background:var(--clr-bg-surface)">
 <div class="container">
 <h2 id="demo-heading" style="text-align:center;margin-bottom:12px;font-size:clamp(1.5rem,3vw,2.2rem)">Live Route Intelligence</h2>
-<p style="text-align:center;color:var(--clr-text-secondary);margin-bottom:32px;font-size:1rem">Real-time global shipping routes rendered from OpenStreetMap data.</p>
+<p style="text-align:center;color:var(--clr-text-secondary);margin-bottom:32px;font-size:1rem">Illustrative emergency corridors rendered from OpenStreetMap data.</p>
 <div id="home-map" style="height:400px;border-radius:16px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,0.12);border:1px solid var(--clr-border)"></div>
 <p style="text-align:center;margin-top:16px;font-size:13px;color:var(--clr-text-muted)">
-<span style="color:#3B82F6">●</span> Asia-Europe &nbsp;
-<span style="color:#8B5CF6">●</span> Trans-Atlantic &nbsp;
-<span style="color:#10B981">●</span> Asia-Pacific
+<span style="color:#3B82F6">●</span> Urban medical lane &nbsp;
+<span style="color:#F59E0B">●</span> Alternate relief lane &nbsp;
+<span style="color:#10B981">●</span> Regional support lane
 </p>
 </div>
 </section>
@@ -260,8 +260,8 @@ View Demo
 <!-- ─── CTA SECTION ────────────────────────────────── -->
 <section class="cta-section" id="cta" aria-labelledby="cta-heading">
 <div class="container">
-<h2 class="cta-section__heading" id="cta-heading">Ready to Ship Smarter?</h2>
-<p class="cta-section__sub">No setup. No contract. Just intelligent routing.</p>
+<h2 class="cta-section__heading" id="cta-heading">Ready to Route Smarter?</h2>
+<p class="cta-section__sub">No setup. Just safer routing for critical deliveries.</p>
 <a href="dashboard.html" class="btn btn--primary btn--xl" id="cta-final">
 Launch Dashboard →
 </a>
