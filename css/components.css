@@ -1493,7 +1493,7 @@ body::before {
     linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
   background-size: 100px 100px;
-  opacity: 0.45;
+  opacity: 0.25;
   pointer-events: none;
   z-index: 0;
 }
@@ -1520,5 +1520,92 @@ body::before {
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border-top: 1px solid rgba(255,255,255,0.06) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   Sections 2+3: Light & Dark theme token system
+   ═══════════════════════════════════════════════════════ */
+
+/* Section 3: Dark theme tokens */
+:root[data-theme="dark"] {
+  --bg-main:    #020617;
+  --bg-surface: #030712;
+  --glass-bg:   rgba(10, 15, 25, 0.55);
+  --glass-border: rgba(255,255,255,0.06);
+}
+
+/* Section 2: Light theme tokens */
+:root[data-theme="light"] {
+  --bg-main:    #f5f7fb;
+  --bg-surface: #eef2f7;
+  --glass-bg:   rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --text-primary:   #0f172a;
+  --text-secondary: #475569;
+}
+
+/* Section 2: Light theme body */
+[data-theme="light"] body {
+  background:
+    radial-gradient(1200px 600px at 75% 30%, rgba(59,130,246,0.05), transparent 60%),
+    radial-gradient(900px 500px at 20% 70%, rgba(16,185,129,0.04), transparent 60%),
+    #f5f7fb !important;
+}
+
+/* Section 4: Light theme grid overlay — even subtler */
+[data-theme="light"] body::before {
+  opacity: 0.15;
+  background-image:
+    linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+}
+
+/* Section 2: Light glass applied to landing surfaces */
+[data-theme="light"] .map-mock,
+[data-theme="light"] .feature-card,
+[data-theme="light"] .cta-section,
+[data-theme="light"] .navbar,
+[data-theme="light"] .footer {
+  background: var(--glass-bg) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border) !important;
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.6);
+}
+
+/* Section 2: Light modal + metrics */
+[data-theme="light"] .modal,
+[data-theme="light"] .notify-modal,
+[data-theme="light"] .ai-metrics {
+  background: rgba(255,255,255,0.75) !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(0,0,0,0.06);
+  color: #0f172a;
+}
+
+/* Section 2: Light theme AI status + chips text */
+[data-theme="light"] .ai-status__line {
+  color: rgba(15,23,42,0.85);
+}
+[data-theme="light"] .ai-chip {
+  background: rgba(16,185,129,0.1);
+  border-color: rgba(16,185,129,0.25);
+  color: #059669;
+}
+[data-theme="light"] .map-insights {
+  color: rgba(15,23,42,0.6);
+}
+[data-theme="light"] .map-insights span {
+  background: rgba(0,0,0,0.04);
+  border: 1px solid rgba(0,0,0,0.06);
+}
+[data-theme="light"] .svg-label {
+  fill: #475569;
+}
+[data-theme="light"] .ai-metrics {
+  background: rgba(255,255,255,0.7) !important;
 }
 

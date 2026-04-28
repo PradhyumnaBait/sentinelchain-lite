@@ -224,7 +224,7 @@
       const rect = preview.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width  - 0.5;
       const y = (e.clientY - rect.top)  / rect.height - 0.5;
-      preview.style.transform = `rotateX(${y * -5}deg) rotateY(${x * 5}deg) scale(1.02)`;
+      preview.style.transform = `rotateX(${y * -4}deg) rotateY(${x * 4}deg) scale(1.01)`;
     });
 
     preview.addEventListener('mouseleave', () => {

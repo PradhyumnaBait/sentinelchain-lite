@@ -635,6 +635,7 @@
 /* Step 7: route scale + hover glows */
 .hero-routes {
   transform: scale(1.03); /* slight — 1.05 can clip; 1.03 is safe */
+  margin-top: 56px; /* clears ai-status + map-insights header row */
 }
 #route-low:hover  { filter: drop-shadow(0 0 5px rgba(16,185,129,0.55)); }
 #route-med:hover  { filter: drop-shadow(0 0 5px rgba(245,158,11,0.55)); }
@@ -671,38 +672,53 @@
   border-radius: inherit;
 }
 
-/* Phase 7: ai-status position */
+/* Section 1 CRITICAL: Overlap fix — ai-status LEFT, map-insights RIGHT */
 .ai-status {
-  top: 18px;
-  left: 18px;
+  top: 20px;
+  left: 20px;
   right: auto;
+  max-width: 55%;
+  z-index: 6;
 }
 .ai-status__line {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
+  line-height: 1.4;
   color: rgba(255,255,255,0.88);
 }
+.ai-resolved {
+  margin-top: 6px;
+  font-size: 13px;
+}
 
-/* Phase 8: map-insights cluster */
+/* Section 1 CRITICAL: map-insights pinned RIGHT, never overlaps ai-status */
 .map-insights {
   position: absolute;
-  top: 18px;
-  left: 230px;
+  top: 20px;
+  right: 20px;
+  left: auto;
+  max-width: 42%;
   display: flex;
-  gap: 12px;
+  gap: 8px;
   flex-wrap: wrap;
+  justify-content: flex-end;
   font-size: 11px;
   color: rgba(255,255,255,0.55);
-  z-index: 10;
+  z-index: 6;
   pointer-events: none;
   font-family: 'SF Mono', 'Fira Code', monospace;
   letter-spacing: 0.02em;
 }
+/* Section 6: weather pill polish */
 .map-insights span {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 20px;
-  padding: 2px 8px;
+  white-space: nowrap;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 999px;
+  padding: 4px 10px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  font-size: 11px;
 }
 
 /* Phase 9: ai-metrics glass pill */
