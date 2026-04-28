@@ -197,7 +197,7 @@
   function setRunning(loading) {
     if (!runBtn) return;
     runBtn.disabled = loading;
-    runBtn.textContent = loading ? 'Running…' : '⚡ Run Simulation';
+    runBtn.textContent = loading ? 'Simulating disruption impact…' : '⚡ Run Simulation';
     runBtn.style.opacity = loading ? '0.7' : '';
   }
 

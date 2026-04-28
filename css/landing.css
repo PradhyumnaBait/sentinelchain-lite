@@ -175,7 +175,7 @@
 /* Part 2: polyline (sharp segments) */
 .hero-routes polyline {
   fill: none;
-  stroke-width: 2.5;
+  stroke-width: 3.5;
   stroke-linejoin: miter;
   stroke-linecap: square;
   opacity: 0.9;
