@@ -88,17 +88,15 @@
   width: 100%;
   height: 420px;
   min-height: 420px;
-  max-height: 420px;    /* Bug 6: hard cap — prevents Leaflet overflow */
   position: relative;
   border-radius: 12px;
-  overflow: hidden;     /* Bug 6: safe here, legend is absolute inside */
+  overflow: hidden;
 }
 
 #map {
   width: 100%;
   height: 420px;
   min-height: 420px;
-  max-height: 420px;    /* Bug 6: match parent cap */
   border-radius: 12px 12px 0 0;
   z-index: 1;
 }

@@ -165,16 +165,17 @@
   }
 
   function buildSimulationView(data, source, destination, scenarioLabel) {
-    const frontend = data.frontend || {};
+    // Handle both direct backend response (data.frontend) and wrapped response
+    const frontend = data.frontend || data || {};
     const aiPanel = frontend.aiPanel || {};
-    const riskScore = aiPanel.riskScore || 50;
+    const riskScore = aiPanel.riskScore || data.riskScore || 50;
     const baseline = 35;
 
     return {
       adjustedRisk: riskScore,
       delay: frontend.delayAvoided || data.delayAvoided || "0 mins",
       cost: `+${Math.max(5, Math.round(riskScore * 0.22))}%`,
-      delta: `+${Math.max(0, riskScore - baseline)} pts`,
+      delta: `▲ +${Math.max(0, riskScore - baseline)} pts`,
       alt: frontend.recommendedRouteName || data.recommendedRouteName || "N/A",
       note:
         aiPanel.recommendation?.body ||
@@ -188,7 +189,7 @@
         },
         {
           label: "Risk engine recalculated",
-          desc: `${frontend.recommendedRouteName || "Alternate route"} is now the safest path under simulated disruption.`,
+          desc: `${frontend.recommendedRouteName || data.recommendedRouteName || "Alternate route"} is now the safest path under simulated disruption.`,
           level: riskScore >= 75 ? "danger" : "warn",
         },
         {

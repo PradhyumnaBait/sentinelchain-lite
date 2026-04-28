@@ -21,53 +21,117 @@
   /* ── Mock data helpers ───────────────────────── */
   function clamp(v) { return Math.max(0, Math.min(100, Number(v) || 0)); }
 
-  function mockRoutes(origin, destination) {
-    const label = () => `${origin} → ${destination}`;
-    return [
-      { id:'route-a', label:'ROUTE A', name:`Primary corridor (${label()})`,
-        eta:14, distance:8420, weather:30, congestion:35, routeVulnerability:38,
-        risk:'low', color:'#059669',
-        coords:[[1.29,103.85],[4.85,100.34],[10.5,92.5],[16.0,67.0],[20.0,47.0]],
-        origin, destination },
-      { id:'route-b', label:'ROUTE B', name:`Alternate relief corridor (${label()})`,
-        eta:18, distance:12100, weather:55, congestion:60, routeVulnerability:62,
-        risk:'medium', color:'#D97706',
-        coords:[[1.29,103.85],[-5.0,98.0],[-15.0,82.0],[-34.4,18.4],[1.0,3.0]],
-        origin, destination },
-      { id:'route-c', label:'ROUTE C', name:`Fast but unstable corridor (${label()})`,
-        eta:12, distance:6900, weather:55, congestion:80, routeVulnerability:92,
-        risk:'high', color:'#DC2626',
-        coords:[[1.29,103.85],[6.0,82.0],[16.0,55.0],[27.0,37.0],[30.0,32.5]],
-        origin, destination }
-    ];
+  // Approximate coordinates for major Indian cities
+  const MOCK_CITY_COORDS = {
+    mumbai:     [19.0760, 72.8777],
+    pune:       [18.5204, 73.8567],
+    delhi:      [28.6139, 77.2090],
+    bangalore:  [12.9716, 77.5946],
+    bengaluru:  [12.9716, 77.5946],
+    chennai:    [13.0827, 80.2707],
+    hyderabad:  [17.3850, 78.4867],
+    kolkata:    [22.5726, 88.3639],
+    guwahati:   [26.1445, 91.7362],
+    shillong:   [25.5788, 91.8933],
+    puducherry: [11.9416, 79.8083],
+    pondicherry:[11.9416, 79.8083],
+    coimbatore: [11.0168, 76.9558],
+    agra:       [27.1767, 78.0081],
+    jaipur:     [26.9124, 75.7873],
+    lucknow:    [26.8467, 80.9462],
+    nagpur:     [21.1458, 79.0882],
+    ahmedabad:  [23.0225, 72.5714],
+    surat:      [21.1702, 72.8311],
+    bhopal:     [23.2599, 77.4126],
+    patna:      [25.5941, 85.1376],
+    chandigarh: [30.7333, 76.7794],
+    kochi:      [9.9312,  76.2673],
+    visakhapatnam: [17.6868, 83.2185],
+    bhubaneswar:[20.2961, 85.8245],
+    ranchi:     [23.3441, 85.3096],
+    raipur:     [21.2514, 81.6296],
+    varanasi:   [25.3176, 82.9739],
+    amritsar:   [31.6340, 74.8723],
+  };
+
+  function resolveMockCoords(cityName) {
+    if (!cityName) return [20.5937, 78.9629];
+    const key = cityName.toLowerCase().trim();
+    if (MOCK_CITY_COORDS[key]) return MOCK_CITY_COORDS[key];
+    const found = Object.keys(MOCK_CITY_COORDS).find((k) => key.includes(k) || k.includes(key));
+    return found ? MOCK_CITY_COORDS[found] : [20.5937, 78.9629];
   }
 
-  function mockAnalysis(route) {
-    const risk = route.riskScore || 0;
-    const lvl  = risk >= 75 ? 'high' : risk >= 50 ? 'medium' : 'low';
-    return {
-      riskScore:  risk,
-      confidence: clamp(85 - Math.abs(risk - 50) * 0.3),
-      factors: {
-        Weather:      route.weather      || 0,
-        Congestion:   route.congestion   || 0,
-        Vulnerability: route.routeVulnerability || 0,
-        Reliability:   clamp(100 - risk)
+  function interpolateMockPath(start, end, steps, offsetFactor) {
+    const pts = [start];
+    for (let i = 1; i < steps; i++) {
+      const t = i / steps;
+      const lat = start[0] + (end[0] - start[0]) * t + offsetFactor * Math.sin(t * Math.PI) * (end[1] - start[1]) * 0.15;
+      const lng = start[1] + (end[1] - start[1]) * t - offsetFactor * Math.sin(t * Math.PI) * (end[0] - start[0]) * 0.15;
+      pts.push([Math.round(lat * 10000) / 10000, Math.round(lng * 10000) / 10000]);
+    }
+    pts.push(end);
+    return pts;
+  }
+
+  function mockRoutes(origin, destination) {
+    const start = resolveMockCoords(origin);
+    const end   = resolveMockCoords(destination);
+    const dLat  = end[0] - start[0];
+    const dLng  = end[1] - start[1];
+    const distKm = Math.round(Math.sqrt(dLat * dLat + dLng * dLng) * 111);
+    const baseEta = Math.max(10, Math.round(distKm * 1.5));
+
+    return [
+      {
+        id: 'route_A', label: 'ROUTE A',
+        name: `Route A`,
+        routeName: 'Route A',
+        summary: `${origin} → Highway (Primary) → ${destination}`,
+        eta: baseEta, etaText: `${Math.round(baseEta * 1.35)} mins`,
+        distance: distKm, distanceText: `${distKm} km`,
+        weather: 30, congestion: 65, routeVulnerability: 38,
+        risk: 'medium', color: '#D97706',
+        riskScore: 48, riskLevel: 'Moderate',
+        weatherCondition: 'Partly Cloudy', trafficLevel: 'High',
+        delayMinutes: 16,
+        coords: interpolateMockPath(start, end, 5, 0),
+        origin, destination,
+        isRecommended: false, isFastest: false,
       },
-      rec: {
-        h: lvl === 'low'    ? 'Route recommended — low risk profile' :
-           lvl === 'medium' ? 'Caution advised — moderate risk factors' :
-                             'High risk — consider alternative routes',
-        b: lvl === 'low'    ? 'All factors within safe thresholds. Proceed.' :
-           lvl === 'medium' ? 'Some factors elevated. Monitor weather and traffic.' :
-                             'Multiple risk factors critical. Route A or B preferred.'
+      {
+        id: 'route_B', label: 'ROUTE B',
+        name: `Route B`,
+        routeName: 'Route B',
+        summary: `${origin} → Alternate Road → ${destination}`,
+        eta: Math.round(baseEta * 1.22), etaText: `${Math.round(baseEta * 1.28)} mins`,
+        distance: Math.round(distKm * 1.18), distanceText: `${Math.round(distKm * 1.18)} km`,
+        weather: 20, congestion: 18, routeVulnerability: 22,
+        risk: 'low', color: '#059669',
+        riskScore: 20, riskLevel: 'Low',
+        weatherCondition: 'Clear', trafficLevel: 'Low',
+        delayMinutes: 3,
+        coords: interpolateMockPath(start, end, 6, 0.6),
+        origin, destination,
+        isRecommended: true, isFastest: false,
       },
-      explanations: [
-        { factor: 'Weather conditions',   impact: `${route.weather}% exposure`,   c: route.weather   > 70 ? '#ef4444' : '#10b981' },
-        { factor: 'Traffic congestion',   impact: `${route.congestion}% risk`,    c: route.congestion> 70 ? '#ef4444' : '#10b981' },
-        { factor: 'Route vulnerability',  impact: `${route.routeVulnerability}% level`, c: route.routeVulnerability>70? '#ef4444' : '#f59e0b' }
-      ]
-    };
+      {
+        id: 'route_C', label: 'ROUTE C',
+        name: `Route C`,
+        routeName: 'Route C',
+        summary: `${origin} → Rural Bypass → ${destination}`,
+        eta: Math.round(baseEta * 1.45), etaText: `${Math.round(baseEta * 1.5)} mins`,
+        distance: Math.round(distKm * 1.32), distanceText: `${Math.round(distKm * 1.32)} km`,
+        weather: 55, congestion: 80, routeVulnerability: 88,
+        risk: 'high', color: '#DC2626',
+        riskScore: 78, riskLevel: 'High',
+        weatherCondition: 'Heavy Rain', trafficLevel: 'Severe',
+        delayMinutes: 35,
+        coords: interpolateMockPath(start, end, 6, -0.5),
+        origin, destination,
+        isRecommended: false, isFastest: true,
+      }
+    ];
   }
 
   async function requestJson(path, options = {}, timeoutMs = 15000) {
@@ -86,16 +150,6 @@
     return json;
   }
 
-  function normalizeRouteCard(route) {
-    return {
-      ...route,
-      weather: clamp(route.weather),
-      congestion: clamp(route.congestion),
-      routeVulnerability: clamp(route.routeVulnerability),
-      coords: Array.isArray(route.coords) ? route.coords : [],
-    };
-  }
-
   async function realFetchRoutes(source, destination, mode = 'driving') {
     const json = await requestJson('/route', {
       method: 'POST',
@@ -106,6 +160,7 @@
       id: route.id,
       label: route.name.toUpperCase(),
       name: route.summary || route.name,
+      routeName: route.name,
       summary: route.summary,
       eta: Math.round((route.durationSeconds || 0) / 60),
       etaText: route.durationInTraffic || route.duration,
@@ -183,24 +238,34 @@
     async analyzeRoute(source, destination, mode = 'driving', simulationScenario = null) {
       if (!USE_BACKEND) {
         await new Promise(r => setTimeout(r, 400));
-        const routes = mockRoutes(source, destination).map(normalizeRouteCard);
+        const routes = mockRoutes(source, destination);
+        const recommended = routes.find(r => r.isRecommended) || routes[0];
         return {
           frontend: {
             routeCards: routes,
-            recommendedRouteId: routes[0].id,
-            recommendedRouteName: routes[0].label,
-            fastestRouteId: routes[2].id,
+            recommendedRouteId: recommended.id,
+            recommendedRouteName: recommended.routeName,
+            fastestRouteId: routes.find(r => r.isFastest)?.id || routes[2].id,
             aiPanel: {
-              selectedRouteId: routes[0].id,
-              riskScore: 38,
-              riskLevel: 'Low',
+              selectedRouteId: recommended.id,
+              riskScore: recommended.riskScore,
+              riskLevel: recommended.riskLevel,
               confidence: 84,
-              factors: mockAnalysis({ ...routes[0], riskScore: 38 }).factors,
-              recommendation: {
-                headline: 'Use Route A for stable emergency delivery',
-                body: 'This route balances lower disruption risk with acceptable travel time.',
+              factors: {
+                Weather: recommended.weather,
+                Traffic: recommended.congestion,
+                Vulnerability: recommended.routeVulnerability,
+                Reliability: Math.max(0, 100 - recommended.riskScore),
               },
-              explanations: mockAnalysis({ ...routes[0], riskScore: 38 }).explanations,
+              recommendation: {
+                headline: `Use ${recommended.routeName} for safer emergency delivery`,
+                body: `${recommended.riskLevel} risk profile. ${recommended.weatherCondition} conditions with ${recommended.trafficLevel} traffic.`,
+              },
+              explanations: [
+                { factor: 'Weather conditions', impact: `${recommended.weather}% exposure` },
+                { factor: 'Traffic congestion', impact: `${recommended.congestion}% risk` },
+                { factor: 'Route vulnerability', impact: `${recommended.routeVulnerability}% level` },
+              ],
               delayAvoided: '12 mins',
             },
             liveMode: false,
@@ -212,24 +277,34 @@
         return await realAnalyzeRoute(source, destination, mode, simulationScenario);
       } catch(e) {
         console.warn('[SCL API] Analysis backend unavailable, using mock:', e.message);
-        const routes = mockRoutes(source, destination).map(normalizeRouteCard);
+        const routes = mockRoutes(source, destination);
+        const recommended = routes.find(r => r.isRecommended) || routes[0];
         return {
           frontend: {
             routeCards: routes,
-            recommendedRouteId: routes[0].id,
-            recommendedRouteName: routes[0].label,
-            fastestRouteId: routes[2].id,
+            recommendedRouteId: recommended.id,
+            recommendedRouteName: recommended.routeName,
+            fastestRouteId: routes.find(r => r.isFastest)?.id || routes[2].id,
             aiPanel: {
-              selectedRouteId: routes[0].id,
-              riskScore: 38,
-              riskLevel: 'Low',
+              selectedRouteId: recommended.id,
+              riskScore: recommended.riskScore,
+              riskLevel: recommended.riskLevel,
               confidence: 80,
-              factors: mockAnalysis({ ...routes[0], riskScore: 38 }).factors,
-              recommendation: {
-                headline: 'Use Route A for stable emergency delivery',
-                body: 'Mock mode is active. Backend analysis is currently unavailable.',
+              factors: {
+                Weather: recommended.weather,
+                Traffic: recommended.congestion,
+                Vulnerability: recommended.routeVulnerability,
+                Reliability: Math.max(0, 100 - recommended.riskScore),
               },
-              explanations: mockAnalysis({ ...routes[0], riskScore: 38 }).explanations,
+              recommendation: {
+                headline: `Use ${recommended.routeName} for safer emergency delivery`,
+                body: 'Mock mode active — backend analysis unavailable.',
+              },
+              explanations: [
+                { factor: 'Weather conditions', impact: `${recommended.weather}% exposure` },
+                { factor: 'Traffic congestion', impact: `${recommended.congestion}% risk` },
+                { factor: 'Route vulnerability', impact: `${recommended.routeVulnerability}% level` },
+              ],
               delayAvoided: '12 mins',
             },
             liveMode: false,

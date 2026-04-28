@@ -243,12 +243,15 @@ function bindGlobalActions() {
         panel.classList.toggle('is-open', panel.classList.contains('open'));
         layout?.classList.toggle('ai-open', panel.classList.contains('open'));
         document.getElementById('ai-panel-toggle')?.setAttribute('aria-expanded', String(panel.classList.contains('open')));
+        // Leaflet recalculate container after panel animation
+        setTimeout(() => { try { if (window._sclMap) window._sclMap.invalidateSize(); } catch (_) {} }, 350);
       }
       if (action === 'close-ai' && panel) {
         e.preventDefault();
         panel.classList.remove('is-open', 'open');
         layout?.classList.remove('ai-open');
         document.getElementById('ai-panel-toggle')?.setAttribute('aria-expanded', 'false');
+        setTimeout(() => { try { if (window._sclMap) window._sclMap.invalidateSize(); } catch (_) {} }, 350);
       }
       if (action === 'history')  { e.preventDefault(); document.body.classList.add('panel-open'); openHistory();  }
       if (action === 'alerts')   { e.preventDefault(); document.body.classList.add('panel-open'); openAlerts();   }

@@ -83,14 +83,20 @@ const runSimulation = async (req, res, next) => {
 
     // Step 5: AI analysis with simulation context
     const [aiAnalysis, agenticAi] = await Promise.all([
-      geminiService.analyzeRiskWithGemini(payloads, source, destination),
+      geminiService.analyzeRiskWithGemini(payloads, source, destination).catch((err) => {
+        console.warn("[SimulationController] Gemini analysis failed (non-fatal):", err.message);
+        return null;
+      }),
       runAiPipeline({
         source,
         destination,
         routes: simRoutes,
         weatherDataList: simWeather,
         trafficDataList: simTraffic,
-        simulationScenario: "none",
+        simulationScenario: normalizedScenario,
+      }).catch((err) => {
+        console.warn("[SimulationController] AI pipeline failed (non-fatal):", err.message);
+        return null;
       }),
     ]);
 

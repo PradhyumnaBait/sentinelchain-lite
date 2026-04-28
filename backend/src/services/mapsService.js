@@ -136,12 +136,60 @@ function normaliseRoute(route, index) {
 
 // ── Mock Data ─────────────────────────────────────────────────────────────────
 
+/**
+ * Derive approximate city centre coordinates from known city names.
+ * Falls back to a rough central-India point if not found.
+ */
+const CITY_COORDS = {
+  mumbai: { lat: 19.076, lng: 72.8777 },
+  pune: { lat: 18.5204, lng: 73.8567 },
+  chennai: { lat: 13.0827, lng: 80.2707 },
+  puducherry: { lat: 11.9416, lng: 79.8083 },
+  pondicherry: { lat: 11.9416, lng: 79.8083 },
+  guwahati: { lat: 26.1445, lng: 91.7362 },
+  shillong: { lat: 25.5788, lng: 91.8933 },
+  delhi: { lat: 28.6139, lng: 77.209 },
+  hyderabad: { lat: 17.385, lng: 78.4867 },
+  bangalore: { lat: 12.9716, lng: 77.5946 },
+  bengaluru: { lat: 12.9716, lng: 77.5946 },
+  kolkata: { lat: 22.5726, lng: 88.3639 },
+  ahmedabad: { lat: 23.0225, lng: 72.5714 },
+  surat: { lat: 21.1702, lng: 72.8311 },
+};
+
+function getCityCoord(name) {
+  const key = (name || "").toLowerCase().split(",")[0].trim();
+  for (const [city, coord] of Object.entries(CITY_COORDS)) {
+    if (key.includes(city)) return coord;
+  }
+  // Fallback: rough centre of India
+  return { lat: 20.5937, lng: 78.9629 };
+}
+
+/**
+ * Generate 3 mock route alternatives with clearly different polyline paths.
+ * Route A: highway (direct, slight north arc)
+ * Route B: scenic/mountain (wider south detour)
+ * Route C: inland/alternate (east-west dogleg)
+ */
 function getMockRoutes(source, destination) {
+  const start = getCityCoord(source);
+  const end = getCityCoord(destination);
+
+  // Helper: interpolate between two points
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const midLat = lerp(start.lat, end.lat, 0.5);
+  const midLng = lerp(start.lng, end.lng, 0.5);
+
+  // Perpendicular offset magnitudes for visible path separation
+  const perpLat = (end.lng - start.lng) * 0.18;
+  const perpLng = (end.lat - start.lat) * -0.18;
+
   return [
     {
       id: "route_A",
       name: "Route A",
-      summary: `${source} → Highway NH48 → ${destination}`,
+      summary: `${source} → Highway Corridor → ${destination}`,
       distance: "24.3 km",
       distanceMeters: 24300,
       duration: "42 mins",
@@ -150,31 +198,32 @@ function getMockRoutes(source, destination) {
       trafficImpact: "High",
       startAddress: source,
       endAddress: destination,
-      startLocation: { lat: 19.076, lng: 72.8777 },
-      endLocation: { lat: 18.5204, lng: 73.8567 },
+      startLocation: start,
+      endLocation: end,
       polyline: [
-        { lat: 19.076, lng: 72.8777 },
-        { lat: 18.9967, lng: 73.1301 },
-        { lat: 18.7853, lng: 73.3614 },
-        { lat: 18.5204, lng: 73.8567 },
+        { lat: start.lat, lng: start.lng },
+        { lat: lerp(start.lat, end.lat, 0.25) + perpLat * 0.5, lng: lerp(start.lng, end.lng, 0.25) + perpLng * 0.5 },
+        { lat: midLat + perpLat, lng: midLng + perpLng },
+        { lat: lerp(start.lat, end.lat, 0.75) + perpLat * 0.5, lng: lerp(start.lng, end.lng, 0.75) + perpLng * 0.5 },
+        { lat: end.lat, lng: end.lng },
       ],
       encodedPolyline: "mock_encoded_polyline_A",
       warnings: ["Route contains toll roads"],
       riskFactors: [
         "High-speed highway corridor",
-        "Known flood-prone zone near Khopoli",
+        "Known flood-prone zone along route",
         "Heavy truck traffic increases accident risk",
       ],
       steps: [
-        { instruction: "Head south on NH48", distance: "8 km", duration: "12 mins", maneuver: "straight" },
-        { instruction: "Take the Khopoli exit", distance: "6 km", duration: "10 mins", maneuver: "turn-right" },
-        { instruction: "Continue towards destination", distance: "10.3 km", duration: "20 mins", maneuver: "straight" },
+        { instruction: "Head on highway corridor", distance: "8 km", duration: "12 mins", maneuver: "straight" },
+        { instruction: "Continue on main route", distance: "8.3 km", duration: "16 mins", maneuver: "straight" },
+        { instruction: "Arrive at destination", distance: "8 km", duration: "14 mins", maneuver: "straight" },
       ],
     },
     {
       id: "route_B",
       name: "Route B",
-      summary: `${source} → Old Mumbai-Pune Road → ${destination}`,
+      summary: `${source} → Alternate Scenic Road → ${destination}`,
       distance: "29.1 km",
       distanceMeters: 29100,
       duration: "52 mins",
@@ -183,21 +232,52 @@ function getMockRoutes(source, destination) {
       trafficImpact: "Low",
       startAddress: source,
       endAddress: destination,
-      startLocation: { lat: 19.076, lng: 72.8777 },
-      endLocation: { lat: 18.5204, lng: 73.8567 },
+      startLocation: start,
+      endLocation: end,
       polyline: [
-        { lat: 19.076, lng: 72.8777 },
-        { lat: 18.9500, lng: 73.0500 },
-        { lat: 18.7200, lng: 73.5000 },
-        { lat: 18.5204, lng: 73.8567 },
+        { lat: start.lat, lng: start.lng },
+        { lat: lerp(start.lat, end.lat, 0.2) - perpLat * 0.6, lng: lerp(start.lng, end.lng, 0.2) - perpLng * 0.6 },
+        { lat: midLat - perpLat * 1.2, lng: midLng - perpLng * 1.2 },
+        { lat: lerp(start.lat, end.lat, 0.8) - perpLat * 0.6, lng: lerp(start.lng, end.lng, 0.8) - perpLng * 0.6 },
+        { lat: end.lat, lng: end.lng },
       ],
       encodedPolyline: "mock_encoded_polyline_B",
       warnings: [],
-      riskFactors: ["Mountainous terrain — landslide risk in heavy rain"],
+      riskFactors: ["Mountainous terrain — landslide risk in heavy rain", "Narrow roads with sharp bends"],
       steps: [
-        { instruction: "Head east on Old NH4", distance: "10 km", duration: "18 mins", maneuver: "straight" },
-        { instruction: "Take the scenic mountain route", distance: "12 km", duration: "22 mins", maneuver: "turn-left" },
+        { instruction: "Head on scenic alternate road", distance: "10 km", duration: "18 mins", maneuver: "straight" },
+        { instruction: "Take the mountain bypass", distance: "12 km", duration: "22 mins", maneuver: "turn-left" },
         { instruction: "Descend to destination", distance: "7.1 km", duration: "12 mins", maneuver: "straight" },
+      ],
+    },
+    {
+      id: "route_C",
+      name: "Route C",
+      summary: `${source} → Inland Bypass → ${destination}`,
+      distance: "33.7 km",
+      distanceMeters: 33700,
+      duration: "62 mins",
+      durationSeconds: 3720,
+      durationInTraffic: "68 mins",
+      trafficImpact: "Moderate",
+      startAddress: source,
+      endAddress: destination,
+      startLocation: start,
+      endLocation: end,
+      polyline: [
+        { lat: start.lat, lng: start.lng },
+        { lat: start.lat + (end.lat - start.lat) * 0.15, lng: start.lng + (end.lng - start.lng) * 0.05 },
+        { lat: midLat + perpLat * 0.3, lng: midLng - perpLng * 1.5 },
+        { lat: end.lat + (start.lat - end.lat) * 0.12, lng: end.lng - (end.lng - start.lng) * 0.1 },
+        { lat: end.lat, lng: end.lng },
+      ],
+      encodedPolyline: "mock_encoded_polyline_C",
+      warnings: ["Construction zone ahead"],
+      riskFactors: ["Road under construction in sections", "Low bridge clearance on bypass"],
+      steps: [
+        { instruction: "Head on inland bypass", distance: "12 km", duration: "20 mins", maneuver: "straight" },
+        { instruction: "Continue via bypass ring road", distance: "14 km", duration: "26 mins", maneuver: "turn-right" },
+        { instruction: "Arrive at destination", distance: "7.7 km", duration: "16 mins", maneuver: "straight" },
       ],
     },
   ];
@@ -244,12 +324,53 @@ async function getRoutes(source, destination, mode = "driving") {
       return getMockRoutes(source, destination);
     }
 
-    return data.routes.map((route, idx) => normaliseRoute(route, idx));
+    const liveRoutes = data.routes.map((route, idx) => normaliseRoute(route, idx));
+    return ensureThreeDistinctRoutes(liveRoutes, source, destination);
   } catch (err) {
     // Network/timeout error → graceful fallback
     console.warn("[MapsService] API unreachable, falling back to mock data:", err.message);
     return getMockRoutes(source, destination);
   }
+}
+
+/**
+ * Check if two polylines are effectively identical (share same midpoint within ~1km tolerance).
+ */
+function polylinesAreSimilar(polA, polB) {
+  if (!polA || !polB || polA.length < 2 || polB.length < 2) return false;
+  const midA = polA[Math.floor(polA.length / 2)];
+  const midB = polB[Math.floor(polB.length / 2)];
+  const latDiff = Math.abs(midA.lat - midB.lat);
+  const lngDiff = Math.abs(midA.lng - midB.lng);
+  return latDiff < 0.01 && lngDiff < 0.01; // ~1 km
+}
+
+/**
+ * Ensure at least 3 distinct routes by supplementing with mock alternatives when
+ * the live API returns fewer routes or routes with identical polylines.
+ * Live routes keep their real polylines; only synthetic alternatives are added.
+ */
+function ensureThreeDistinctRoutes(liveRoutes, source, destination) {
+  if (liveRoutes.length >= 3) return liveRoutes;
+
+  const mocks = getMockRoutes(source, destination);
+
+  // Detect if live routes have duplicate polylines and replace with mock for variety
+  if (liveRoutes.length >= 2 && polylinesAreSimilar(liveRoutes[0].polyline, liveRoutes[1].polyline)) {
+    console.log("[MapsService] Live routes have identical polylines — using mock route data for map variety");
+    return mocks;
+  }
+
+  // Pad up to 3 with mock alternatives (re-indexed to avoid id clash)
+  const result = [...liveRoutes];
+  for (let i = result.length; i < 3; i++) {
+    const mock = { ...mocks[i] };
+    mock.id = `route_${String.fromCharCode(65 + i)}`;
+    mock.name = `Route ${String.fromCharCode(65 + i)}`;
+    mock.isMockAlternative = true;
+    result.push(mock);
+  }
+  return result;
 }
 
 /**

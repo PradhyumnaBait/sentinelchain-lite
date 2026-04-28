@@ -122,7 +122,7 @@
   function saveHistory(route) {
     const history = loadJson(STORAGE_KEYS.history, []);
     history.unshift({
-      route: route.routeName || route.name,
+      route: route.routeName || route.name || route.label || route.id,
       score: route.riskScore,
       level: route.riskLevel,
       eta: route.etaText,
@@ -136,10 +136,11 @@
   function addAlertsForRoute(route) {
     const alerts = loadJson(STORAGE_KEYS.alerts, []);
     const next = [];
+    const displayName = route.routeName || route.name || route.label || route.id;
 
-    if (route.riskScore >= 75) next.push(`Avoid ${route.routeName}: current disruption risk is high.`);
-    if (route.weatherCondition) next.push(`${route.routeName}: ${route.weatherCondition} on corridor.`);
-    if (route.delayMinutes >= 10) next.push(`${route.routeName}: traffic delay estimate is ${route.delayMinutes} mins.`);
+    if (route.riskScore >= 75) next.push(`Avoid ${displayName}: current disruption risk is high.`);
+    if (route.weatherCondition) next.push(`${displayName}: ${route.weatherCondition} on corridor.`);
+    if (route.delayMinutes >= 10) next.push(`${displayName}: traffic delay estimate is ${route.delayMinutes} mins.`);
 
     saveJson(STORAGE_KEYS.alerts, [...next, ...alerts].slice(0, 25));
     updateAlertBadge();
@@ -209,6 +210,12 @@
       maxZoom: 18,
     }).addTo(state.map);
     window.L.control.zoom({ position: "topright" }).addTo(state.map);
+    // Expose instance globally so global.js can call invalidateSize on panel resize
+    window._sclMap = state.map;
+    // Force Leaflet to recalculate container size after DOM is fully rendered
+    setTimeout(() => {
+      try { state.map.invalidateSize(); } catch (_) {}
+    }, 200);
   }
 
   function clearRouteLayers() {
@@ -220,29 +227,54 @@
     state.routeLayers = {};
   }
 
-  function drawRoutes() {
+  function drawRoutes(fitSelection) {
     if (!state.map) return;
     clearRouteLayers();
+
+    const allCoords = [];
 
     state.routes.forEach((route) => {
       if (!route.coords || route.coords.length < 2) return;
       const selected = route.id === state.selectedRouteId;
-      const layer = window.L.polyline(route.coords, {
-        color: route.color || getRiskColor(route.riskScore),
-        weight: selected ? 6 : 4,
-        opacity: selected ? 0.95 : 0.6,
-      }).addTo(state.map);
-      layer.bindPopup(
-        `<strong>${route.routeName}</strong><br>${route.riskLevel} (${route.riskScore})<br>${route.etaText}`
+      const riskColor = route.color || getRiskColor(route.riskScore || 0);
+
+      // Normalize coords: accept both [[lat,lng]] and [{lat,lng}] formats
+      const latLngs = route.coords.map((c) =>
+        Array.isArray(c) ? [c[0], c[1]] : [c.lat, c.lng]
       );
+
+      const layer = window.L.polyline(latLngs, {
+        color: riskColor,
+        weight: selected ? 7 : 3,
+        opacity: selected ? 1.0 : 0.45,
+      }).addTo(state.map);
+
+      if (selected) layer.bringToFront();
+
+      const routeDisplayName = route.routeName || route.name || route.label || route.id;
+      const riskLevelText = route.riskLevel || getRiskLabel(route.riskScore || 0);
+      layer.bindPopup(
+        `<strong>${routeDisplayName}</strong><br>` +
+        `Risk: ${riskLevelText} (${route.riskScore || 0}/100)<br>` +
+        `ETA: ${route.etaText || route.eta + " mins" || "N/A"}<br>` +
+        `Distance: ${route.distanceText || route.distance || "N/A"}`
+      );
+
       state.routeLayers[route.id] = layer;
+      latLngs.forEach((c) => allCoords.push(c));
     });
 
-    const selectedLayer = state.routeLayers[state.selectedRouteId];
-    const fallbackLayer = state.routeLayers[state.recommendedRouteId] || Object.values(state.routeLayers)[0];
-    const targetLayer = selectedLayer || fallbackLayer;
-    if (targetLayer) {
-      state.map.fitBounds(targetLayer.getBounds(), { padding: [30, 30], maxZoom: 10 });
+    if (fitSelection) {
+      const selectedLayer = state.routeLayers[state.selectedRouteId];
+      if (selectedLayer) {
+        try {
+          state.map.fitBounds(selectedLayer.getBounds(), { padding: [40, 40], maxZoom: 11 });
+        } catch (_) {}
+      }
+    } else if (allCoords.length >= 2) {
+      try {
+        state.map.fitBounds(window.L.latLngBounds(allCoords), { padding: [40, 40], maxZoom: 10 });
+      } catch (_) {}
     }
   }
 
@@ -317,7 +349,8 @@
     }
     if (refs.scoreSub) {
       const selected = state.routes.find((route) => route.id === state.selectedRouteId);
-      refs.scoreSub.textContent = selected ? `${selected.routeName} selected` : "Awaiting analysis";
+      const displayName = selected ? (selected.routeName || selected.name || selected.label || selected.id) : null;
+      refs.scoreSub.textContent = displayName ? `${displayName} selected` : "Awaiting analysis";
     }
     if (refs.factors) {
       refs.factors.innerHTML = Object.entries(panel.factors || {})
@@ -350,7 +383,7 @@
 
   function render() {
     renderRouteCards();
-    drawRoutes();
+    drawRoutes(false);  // fitSelection = false → fit ALL routes on initial load
     renderAiPanel();
   }
 
@@ -370,28 +403,44 @@
     if (!route) return;
 
     state.selectedRouteId = routeId;
+
+    // Build per-route AI panel data from the selected route's fields
+    const explanationFactors = Array.isArray(route.explanation?.factors)
+      ? route.explanation.factors
+      : Array.isArray(route.riskFactors)
+      ? route.riskFactors.map((f) => ({ factor: f, impact: route.riskScore >= 75 ? "High impact" : "Watch" }))
+      : [];
+
     state.aiPanel = {
       ...state.aiPanel,
       selectedRouteId: route.id,
-      riskScore: route.riskScore,
-      riskLevel: route.riskLevel,
+      riskScore: route.riskScore || 0,
+      riskLevel: route.riskLevel || getRiskLabel(route.riskScore || 0),
+      confidence: state.aiPanel?.confidence || 80,
       factors: {
-        Weather: route.weather,
-        Traffic: route.congestion,
-        Vulnerability: route.routeVulnerability,
-        Reliability: Math.max(0, 100 - route.riskScore),
+        Weather: route.weather || 0,
+        Traffic: route.congestion || 0,
+        Vulnerability: route.routeVulnerability || 0,
+        Reliability: Math.max(0, 100 - (route.riskScore || 0)),
       },
-      recommendation: state.aiPanel?.recommendation || {},
-      explanations: route.explanation?.factors || [],
+      recommendation: state.aiPanel?.recommendation || {
+        headline: `Viewing ${route.routeName || route.name || route.label || route.id}`,
+        body: `Risk score: ${route.riskScore || 0}. ${route.weatherCondition || ""} conditions, ${route.trafficLevel || ""} traffic.`,
+      },
+      explanations: explanationFactors,
     };
 
-    render();
+    // Re-render cards + AI panel, and re-draw map highlighting new selection
+    renderRouteCards();
+    drawRoutes(true);   // fitSelection = true → pan to selected route
+    renderAiPanel();
 
     if (fromUser) {
       saveHistory(route);
       addAlertsForRoute(route);
-      if (route.riskScore >= 75) {
-        showAlert(`Warning: ${route.routeName} currently has elevated disruption risk.`, "danger");
+      const displayName = route.routeName || route.name || route.label || route.id;
+      if ((route.riskScore || 0) >= 75) {
+        showAlert(`Warning: ${displayName} currently has elevated disruption risk.`, "danger");
       } else {
         hideAlert();
       }
@@ -416,8 +465,9 @@
     if (selected) {
       saveHistory(selected);
       addAlertsForRoute(selected);
+      const displayName = selected.routeName || selected.name || selected.label || selected.id;
       showAlert(
-        `${frontend.recommendedRouteName || selected.routeName} recommended. Estimated delay avoided: ${frontend.delayAvoided || "0 mins"}.`,
+        `${frontend.recommendedRouteName || displayName} recommended. Estimated delay avoided: ${frontend.delayAvoided || "0 mins"}.`,
         selected.riskScore >= 75 ? "warning" : "info"
       );
     }
@@ -490,7 +540,8 @@
     refs.recAcceptBtn?.addEventListener("click", () => {
       const route = state.routes.find((item) => item.id === state.selectedRouteId);
       if (!route) return;
-      showAlert(`Route accepted: ${route.routeName}. Dispatch team can proceed.`, "info");
+      const displayName = route.routeName || route.name || route.label || route.id;
+      showAlert(`Route accepted: ${displayName}. Dispatch team can proceed.`, "info");
     });
 
     refs.sidebarAlerts?.addEventListener("click", (event) => {
@@ -509,11 +560,48 @@
     refs.mapZoomIn?.addEventListener("click", () => state.map?.zoomIn());
     refs.mapZoomOut?.addEventListener("click", () => state.map?.zoomOut());
     refs.mapReset?.addEventListener("click", () => {
-      if (state.routes.length) drawRoutes();
+      if (state.routes.length) drawRoutes(false);
+      else if (state.map) state.map.setView([20.5937, 78.9629], 5);
     });
 
-    refs.aiToggle?.addEventListener("click", () => refs.aiPanel?.classList.toggle("is-open"));
-    refs.aiClose?.addEventListener("click", () => refs.aiPanel?.classList.remove("is-open"));
+    // Layer toggle: switch between standard OSM and dark CartoDB tiles
+    let useAltTiles = false;
+    let currentTileLayer = null;
+    const layerToggleBtn = document.getElementById("map-layer-toggle");
+    layerToggleBtn?.addEventListener("click", () => {
+      if (!state.map) return;
+      useAltTiles = !useAltTiles;
+      if (currentTileLayer) {
+        state.map.removeLayer(currentTileLayer);
+      }
+      if (useAltTiles) {
+        currentTileLayer = window.L.tileLayer(
+          "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+          { attribution: "&copy; OpenStreetMap &copy; CartoDB", maxZoom: 19 }
+        ).addTo(state.map);
+        layerToggleBtn.title = "Switch to standard map";
+        layerToggleBtn.textContent = "🗺";
+      } else {
+        currentTileLayer = window.L.tileLayer(
+          "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+          { attribution: "&copy; OpenStreetMap contributors", maxZoom: 18 }
+        ).addTo(state.map);
+        layerToggleBtn.title = "Switch to dark map";
+        layerToggleBtn.textContent = "⬡";
+      }
+      // Re-draw routes on top of new tile layer
+      if (state.routes.length) drawRoutes(false);
+    });
+
+    refs.aiToggle?.addEventListener("click", () => {
+      refs.aiPanel?.classList.toggle("is-open");
+      // Leaflet needs to recalculate its container size after the panel opens/closes
+      setTimeout(() => { try { state.map?.invalidateSize(); } catch (_) {} }, 350);
+    });
+    refs.aiClose?.addEventListener("click", () => {
+      refs.aiPanel?.classList.remove("is-open");
+      setTimeout(() => { try { state.map?.invalidateSize(); } catch (_) {} }, 350);
+    });
 
     if (refs.hamburger && refs.sidebar) {
       refs.hamburger.addEventListener("click", () => {

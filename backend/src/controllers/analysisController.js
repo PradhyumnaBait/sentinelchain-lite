@@ -48,8 +48,12 @@ const analyzeRoute = async (req, res, next) => {
       riskBuilder.buildAllRiskPayloads(routes, weatherDataList, trafficDataList);
 
     // Step 5: Legacy Gemini analysis + new AI-layer orchestrator analysis
+    // Each AI call is isolated so a missing API key / timeout never crashes the route response.
     const [aiAnalysis, agenticAi] = await Promise.all([
-      geminiService.analyzeRiskWithGemini(payloads, source, destination),
+      geminiService.analyzeRiskWithGemini(payloads, source, destination).catch((err) => {
+        console.warn("[AnalysisController] Gemini analysis failed (non-fatal):", err.message);
+        return null;
+      }),
       runAiPipeline({
         source,
         destination,
@@ -57,6 +61,9 @@ const analyzeRoute = async (req, res, next) => {
         weatherDataList,
         trafficDataList,
         simulationScenario: req.body.simulationScenario || "none",
+      }).catch((err) => {
+        console.warn("[AnalysisController] AI pipeline failed (non-fatal):", err.message);
+        return null;
       }),
     ]);
 
