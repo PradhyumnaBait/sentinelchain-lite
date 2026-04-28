@@ -8,7 +8,18 @@
 (function(global) {
 
   const USE_BACKEND = true;
-  const API_BASE = '/api';
+
+  /**
+   * Auto-detect the correct API base URL.
+   * - When served by the Express backend (localhost:5000), use relative /api
+   * - When opened as a file:// or from a different port, point directly to the backend
+   */
+  const BACKEND_PORT = 5000;
+  const isFileProtocol = window.location.protocol === 'file:';
+  const isWrongPort    = window.location.port && window.location.port !== String(BACKEND_PORT);
+  const API_BASE = (isFileProtocol || isWrongPort)
+    ? `http://localhost:${BACKEND_PORT}/api`
+    : '/api';
 
   /* ── Request timeout helper ──────────────────── */
   function withTimeout(promise, ms) {
